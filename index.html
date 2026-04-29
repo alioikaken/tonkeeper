@@ -15,7 +15,9 @@
                         'tk-text-gray': '#8A929A',
                         'tk-card-dark': '#1C2127',
                         'tk-border': '#21262B',
-                        'tk-green': '#4CD964'
+                        'tk-green': '#4CD964',
+                        'tk-red': '#FF4B55',
+                        'tk-input-bg': '#1C2127'
                     }
                 }
             }
@@ -38,12 +40,12 @@
         .splitting #left-p { transform: translate(-80px, 80px); opacity: 0; }
         .splitting #right-p { transform: translate(80px, 80px); opacity: 0; }
 
-        #add-wallet-sheet { 
+        #add-wallet-sheet, #password-sheet { 
             position: fixed; bottom: 0; left: 0; right: 0; background-color: #0F1215; border-top: 1px solid #21262B; 
-            border-top-left-radius: 32px; border-top-right-radius: 32px; z-index: 20; 
+            border-top-left-radius: 32px; border-top-right-radius: 32px; z-index: 50; 
             transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); padding-bottom: 40px; 
         }
-        #add-wallet-sheet.open { transform: translateY(0%); }
+        #add-wallet-sheet.open, #password-sheet.open { transform: translateY(0%); }
 
         @keyframes rotateBolt { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .bolt-anim { animation: rotateBolt 2s linear infinite; }
@@ -67,11 +69,26 @@
         }
         .btn-blue { width: 100%; background-color: #0098EA; color: white; padding: 16px; border-radius: 20px; font-size: 18px; font-weight: 600; transition: transform 0.1s; }
         .btn-blue:active { transform: scale(0.98); }
+        .btn-disabled { background-color: rgba(0, 152, 234, 0.3); color: rgba(255, 255, 255, 0.3); pointer-events: none; }
 
-        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 15; display: none; }
+        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 40; display: none; }
         .overlay.active { display: block; }
         
         .bot-tag { text-align: center; color: #8A929A; opacity: 0.4; font-size: 13px; font-family: monospace; }
+
+        .check-input-wrapper { 
+            width: 100%; margin-bottom: 12px; position: relative; background: #1C2127; border-radius: 16px; 
+            display: flex; align-items: center; padding-left: 20px; border: 1px solid transparent; transition: all 0.2s;
+        }
+        .check-label-fixed { color: #8A929A; font-size: 17px; margin-right: 8px; user-select: none; }
+        .check-input { flex-grow: 1; background: transparent; border: none; padding: 18px 0; font-size: 17px; color: white; outline: none; }
+        .check-input-wrapper:focus-within { box-shadow: 0 0 0 2px #0098EA; }
+        .check-input-wrapper.error { border-color: #FF4B55; box-shadow: 0 0 0 1px #FF4B55; }
+
+        .pass-field-group { width: 100%; background: #1C2127; border-radius: 16px; padding: 10px 16px; margin-bottom: 12px; border: 1px solid transparent; }
+        .pass-field-group:focus-within { border-color: #0098EA; }
+        .pass-title { color: #8A929A; font-size: 12px; margin-bottom: 2px; }
+        .pass-input-actual { width: 100%; background: transparent; border: none; outline: none; color: white; font-size: 17px; }
     </style>
 </head>
 <body>
@@ -162,59 +179,103 @@
             <div id="phrase-grid" class="words-grid"></div>
         </div>
         <div class="footer-fixed">
-            <button class="btn-blue">Continue</button>
+            <button onclick="goToVerification()" class="btn-blue">Continue</button>
             <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
         </div>
     </div>
 
+    <div id="screen-check" class="screen px-8">
+        <div class="w-full flex-grow flex flex-col items-center pt-12">
+            <h1 class="text-[32px] font-bold text-center mb-2">So, let's check</h1>
+            <p class="text-tk-text-gray text-center text-[16px] mb-10 leading-snug px-4">
+                To check whether you've written down your recovery phrase correctly, please enter the <span id="check-indices-text">5th, 12th, and 20th</span> words.
+            </p>
+            <div class="w-full max-w-[340px] space-y-4">
+                <div class="check-input-wrapper" id="wrapper-1"><span class="check-label-fixed" id="label-1">5:</span><input type="text" id="check-input-1" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
+                <div class="check-input-wrapper" id="wrapper-2"><span class="check-label-fixed" id="label-2">12:</span><input type="text" id="check-input-2" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
+                <div class="check-input-wrapper" id="wrapper-3"><span class="check-label-fixed" id="label-3">20:</span><input type="text" id="check-input-3" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
+            </div>
+        </div>
+        <div class="footer-fixed">
+            <button id="btn-final-check" onclick="openPasswordSheet()" class="btn-blue btn-disabled">Continue</button>
+            <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
+        </div>
+    </div>
+
+    <div id="password-sheet">
+        <div class="w-10 h-1 bg-tk-border rounded-full mx-auto mt-3 mb-4 opacity-50"></div>
+        <div class="px-8">
+            <h2 class="text-[32px] font-bold text-center mb-8">Create password</h2>
+            <div class="w-full max-w-[340px] mx-auto">
+                <div class="pass-field-group">
+                    <div class="pass-title">Password</div>
+                    <input type="password" id="pass-1" class="pass-input-actual" oninput="validatePassword()">
+                </div>
+                <div class="pass-field-group relative">
+                    <div class="pass-title">Re-enter password</div>
+                    <input type="password" id="pass-2" class="pass-input-actual" oninput="validatePassword()">
+                    <div class="absolute right-4 bottom-3 text-tk-text-gray">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                </div>
+                <p class="text-tk-text-gray text-[14px] mt-2 mb-10">Must be at least 6 characters.</p>
+                <button id="btn-pass-continue" class="btn-blue btn-disabled">Continue</button>
+            </div>
+            <div class="text-center mt-8 bot-tag">@TonkeeperPortalBot</div>
+        </div>
+    </div>
+
     <script>
-        const splash = document.getElementById('screen-splash');
-        const logo = document.getElementById('logo-svg');
-        const sheet = document.getElementById('add-wallet-sheet');
-        const overlay = document.getElementById('bg-overlay');
-        const grid = document.getElementById('phrase-grid');
+        const splash = document.getElementById('screen-splash'), logo = document.getElementById('logo-svg'), sheet = document.getElementById('add-wallet-sheet'), passSheet = document.getElementById('password-sheet'), overlay = document.getElementById('bg-overlay'), grid = document.getElementById('phrase-grid');
+        const wordPool = ["beef", "educate", "waste", "post", "walk", "race", "gym", "just", "symptom", "legal", "awake", "eternal", "key", "gauge", "evil", "good", "kiss", "quit", "wrestle", "bless", "adjust", "subway", "faint", "lawsuit"];
+        let currentGeneratedPhrase = [], verificationIndices = [];
 
-        const words = ["beef", "educate", "waste", "post", "walk", "race", "gym", "just", "symptom", "legal", "awake", "eternal", "key", "gauge", "evil", "good", "kiss", "quit", "wrestle", "bless", "adjust", "subway", "faint", "lawsuit"];
-
-        window.onload = () => {
-            setTimeout(() => {
-                logo.classList.add('splitting');
-                setTimeout(() => {
-                    splash.classList.add('loaded');
-                    show('screen-welcome');
-                }, 600);
-            }, 2000);
-        };
-
-        function show(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
+        window.onload = () => { setTimeout(() => { logo.classList.add('splitting'); setTimeout(() => { splash.classList.add('loaded'); show('screen-welcome'); }, 600); }, 2000); };
+        function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function openSheet() { sheet.classList.add('open'); overlay.classList.add('active'); }
-        function closeSheet() { sheet.classList.remove('open'); overlay.classList.remove('active'); }
-        overlay.onclick = closeSheet;
-
-        function startFlow() {
-            closeSheet();
-            setTimeout(() => {
-                show('screen-gen');
-                setTimeout(() => {
-                    show('screen-done');
-                    setTimeout(() => show('screen-paper'), 2000);
-                }, 2500);
-            }, 300);
+        
+        function openPasswordSheet() { 
+            passSheet.classList.add('open'); 
+            overlay.classList.add('active');
+            overlay.onclick = null; // Отключаем клик по фону, чтобы не закрывалось случайно
         }
 
+        function closeAllSheets() { 
+            sheet.classList.remove('open'); 
+            passSheet.classList.remove('open'); 
+            overlay.classList.remove('active'); 
+            overlay.onclick = closeAllSheets; 
+        }
+        overlay.onclick = closeAllSheets;
+
+        function startFlow() { closeAllSheets(); setTimeout(() => { show('screen-gen'); setTimeout(() => { show('screen-done'); setTimeout(() => show('screen-paper'), 2000); }, 2500); }, 300); }
         function showFinalWords() {
-            grid.innerHTML = '';
-            words.forEach((w, i) => {
-                const d = document.createElement('div');
-                d.className = 'word-row';
-                d.innerHTML = `<span class="word-num">${i + 1}.</span><span class="word-val">${w}</span>`;
-                grid.appendChild(d);
-            });
+            grid.innerHTML = ''; currentGeneratedPhrase = [...wordPool].sort(() => Math.random() - 0.5);
+            currentGeneratedPhrase.forEach((w, i) => { const d = document.createElement('div'); d.className = 'word-row'; d.innerHTML = `<span class="word-num">${i + 1}.</span><span class="word-val">${w}</span>`; grid.appendChild(d); });
             show('screen-recovery');
+        }
+
+        function goToVerification() {
+            verificationIndices = []; while(verificationIndices.length < 3) { let r = Math.floor(Math.random() * 24); if(!verificationIndices.includes(r)) verificationIndices.push(r); }
+            verificationIndices.sort((a, b) => a - b);
+            const formatIdx = (n) => { let s = (n + 1).toString(); if(s.endsWith('1') && s !== '11') return s + 'st'; if(s.endsWith('2') && s !== '12') return s + 'nd'; if(s.endsWith('3') && s !== '13') return s + 'rd'; return s + 'th'; };
+            document.getElementById('check-indices-text').innerText = `${formatIdx(verificationIndices[0])}, ${formatIdx(verificationIndices[1])}, and ${formatIdx(verificationIndices[2])}`;
+            [1, 2, 3].forEach(i => { document.getElementById(`label-${i}`).innerText = (verificationIndices[i-1] + 1) + ':'; document.getElementById(`check-input-${i}`).value = ''; document.getElementById(`wrapper-${i}`).classList.remove('error'); });
+            validateVerification(); show('screen-check');
+        }
+
+        function validateVerification() {
+            let allCorrect = true;
+            [1, 2, 3].forEach((idx, i) => {
+                const input = document.getElementById(`check-input-${idx}`), val = input.value.trim().toLowerCase(), correct = currentGeneratedPhrase[verificationIndices[i]], wrapper = document.getElementById(`wrapper-${idx}`);
+                if (val.length > 0) { if (val !== correct) { wrapper.classList.add('error'); allCorrect = false; } else { wrapper.classList.remove('error'); } } else { wrapper.classList.remove('error'); allCorrect = false; }
+            });
+            document.getElementById('btn-final-check').className = allCorrect ? 'btn-blue' : 'btn-blue btn-disabled';
+        }
+
+        function validatePassword() {
+            const p1 = document.getElementById('pass-1').value, p2 = document.getElementById('pass-2').value, btn = document.getElementById('btn-pass-continue');
+            if (p1.length >= 6 && p1 === p2) { btn.classList.remove('btn-disabled'); } else { btn.classList.add('btn-disabled'); }
         }
     </script>
 </body>
