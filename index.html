@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tonkeeper Mini App Pixel Perfect Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Настраиваем точные Hex-коды цветов со скриншота image_2.png
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tk-dark': '#101418', // Основной глубокий фон окна
+                        'tk-header': '#12161A', // Фон хедера и футера
+                        'tk-blue': '#0098EA', // Фирменный синий TON для кнопок и акцентов
+                        'tk-icon-blue': '#31A6F1', // Цвет для иконок преимуществ
+                        'tk-border': '#21262B', // Цвет разделительных линий
+                        'tk-text-gray': '#8A929A', // Цвет текста описаний
+                        'tk-icon-gray': '#707579', // Цвет иконок в хедере
+                    },
+                    borderRadius: {
+                        'tk-modal': '16px', // Точное скругление модального окна
+                        'tk-btn': '16px', // Точное скругление кнопки
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #000; /* Внешний фон Telegram Desktop */
+            margin: 0; 
+            /* Используем системные шрифты, как в Telegram Desktop */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            overflow: hidden; 
+        }
+        /* Стили для кнопок в хедере (эффект при наведении, как в Telegram) */
+        .header-action-btn:hover {
+            background-color: rgba(112, 117, 121, 0.08);
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen p-4">
+
+    <div class="bg-tk-dark w-full max-w-[420px] rounded-tk-modal shadow-2xl overflow-hidden flex flex-col border border-tk-border">
+        
+        <header class="flex items-center justify-between px-5 py-3.5 bg-tk-header border-b border-tk-border">
+            <div class="flex items-center gap-2">
+                <span class="text-white font-semibold text-[17px]">Tonkeeper</span>
+                <span class="bg-tk-blue text-white rounded-full p-[3px] flex items-center justify-center">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 3L4.5 8.5L2 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </div>
+            <div class="flex gap-1.5 text-tk-icon-gray">
+                <button class="header-action-btn p-2 rounded-full transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16c1.104 0 2 .896 2 2s-.896 2-2 2-2-.896-2-2 .896-2 2-2zm0-6c1.104 0 2 .896 2 2s-.896 2-2 2-2-.896-2-2 .896-2 2-2zm0-6c1.104 0 2 .896 2 2s-.896 2-2 2-2-.896-2-2 .896-2 2-2z"/></svg>
+                </button>
+                <button class="header-action-btn p-2 rounded-full transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-8 flex flex-col">
+            
+            <h1 class="text-white text-[32px] font-bold leading-tight mb-10">
+                Welcome<br>to <span class="text-tk-blue">Tonkeeper</span>
+            </h1>
+
+            <div class="space-y-7 mb-12">
+                <div class="flex gap-4 items-start">
+                    <div class="text-tk-icon-blue w-10 h-10 flex-shrink-0 flex items-center justify-center">
+                        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M28.3334 5.66666C28.3334 5.66666 19.8334 4.25 12.75 11.3333C8.67341 15.4099 7.08337 21.25 7.08337 21.25L11.3334 22.6667C11.3334 22.6667 12.0417 19.8333 14.1667 17.7083L19.8334 23.375C17.7084 25.5 14.875 26.2083 14.875 26.2083L16.2917 30.4583C16.2917 30.4583 22.1317 28.8683 26.2084 24.7917C33.2917 17.7083 31.875 9.20833 31.875 9.20833L28.3334 5.66666Z" fill="#31A6F1"/>
+                            <path d="M19.8334 14.1667C18.6601 14.1667 17.7084 13.215 17.7084 12.0417C17.7084 10.8684 18.6601 9.91666 19.8334 9.91666C21.0067 9.91666 21.9584 10.8684 21.9584 12.0417C21.9584 13.215 21.0067 14.1667 19.8334 14.1667Z" fill="white"/>
+                            <path d="M5.66663 22.6667L2.125 28.3333L8.5 26.9167L5.66663 22.6667Z" fill="#31A6F1"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-[16px] mb-0.5">World-class speed</h3>
+                        <p class="text-tk-text-gray text-[14px] leading-relaxed">
+                            Thanks to the unique architecture of The Open Network, TON transactions are settled in seconds.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 items-start">
+                    <div class="text-tk-icon-blue w-10 h-10 flex-shrink-0 flex items-center justify-center">
+                        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 2.83334C17 2.83334 11.3333 5.66667 4.25 5.66667V15.5833C4.25 21.9796 9.72167 27.8529 17 31.1667C24.2783 27.8529 29.75 21.9796 29.75 15.5833V5.66667C22.6667 5.66667 17 2.83334 17 2.83334Z" fill="#31A6F1"/>
+                            <path d="M17 17.8867C15.6575 17.8867 14.5625 16.7917 14.5625 15.4492C14.5625 14.1067 15.6575 13.0117 17 13.0117C18.3425 13.0117 19.4375 14.1067 19.4375 15.4492C19.4375 16.7917 18.3425 17.8867 17 17.8867Z" fill="white"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M21.76 11.0181L18.562 14.2161C19.2356 15.042 19.4306 16.1303 19.0441 17.1583C18.5906 18.346 17.442 19.1506 16.1728 19.1506C14.5278 19.1506 13.1983 17.8211 13.1983 16.1761C13.1983 14.6587 14.3292 13.4286 15.8041 13.2229L21.76 11.0181Z" fill="white"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-semibold text-[16px] mb-0.5">End-to-end security</h3>
+                        <p class="text-tk-text-gray text-[14px] leading-relaxed">
+                            Tonkeeper stores your cryptographic keys on your device. Your crypto is always in your hands.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="w-full bg-tk-blue text-white font-semibold text-[17px] py-3.5 rounded-tk-btn hover:brightness-105 active:scale-[0.98] transition-all">
+                Get started
+            </button>
+        </main>
+
+        <footer class="text-center py-3.5 bg-tk-header border-t border-tk-border mt-auto">
+            <span class="text-tk-icon-gray text-[13px] font-mono">@tonkeeper</span>
+        </footer>
+    </div>
+
+</body>
+</html>
