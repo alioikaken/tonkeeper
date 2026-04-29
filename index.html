@@ -11,6 +11,7 @@
                 extend: {
                     colors: {
                         'tk-dark': '#0F1215',
+                        'tk-splash-bg': '#12161A',
                         'tk-blue': '#0098EA',
                         'tk-icon-blue': '#31A6F1',
                         'tk-text-gray': '#8A929A',
@@ -24,9 +25,9 @@
         }
     </script>
     <style>
-        body { background-color: #0F1215; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; height: 100vh; color: white; }
+        body { background-color: #0F1215; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; height: 100vh; color: white; width: 100vw; }
         
-        /* Стили для экранов */
+        /* Стили для всех экранов */
         .screen { 
             position: fixed; 
             inset: 0; 
@@ -37,9 +38,34 @@
             z-index: 10;
             visibility: hidden;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scale(1.05);
         }
-        .screen.active { visibility: visible; opacity: 1; }
+        .screen.active { visibility: visible; opacity: 1; transform: scale(1); }
+
+        /* === ЭКРАН SPLASH (ЗАГРУЗКА С ЛОГО TONKEEPER) === */
+        #screen-splash {
+            z-index: 100;
+            background-color: #12161A;
+            visibility: visible;
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+        #screen-splash.loaded {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Анимация логотипа Tonkeeper */
+        @keyframes tonPulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+        .ton-logo-animate {
+            animation: tonPulse 2s ease-in-out infinite;
+        }
 
         /* Шторка (Add Wallet) */
         #add-wallet-sheet { 
@@ -58,44 +84,13 @@
         }
         #add-wallet-sheet.open { transform: translateY(0%); }
 
-        /* === ИДЕАЛЬНАЯ АНИМАЦИЯ БОЛТА === */
-        @keyframes rotateBoltPerfect {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .bolt-animate-perfect { 
-            animation: rotateBoltPerfect 2s linear infinite; 
-            transform-origin: center;
-        }
-
-        /* === ИДЕАЛЬНАЯ АНИМАЦИЯ РИСУЮЩЕЙСЯ ГАЛОЧКИ === */
-        /* Анимация круга вокруг галочки */
-        .checkmark-circle-animate { 
-            stroke-dasharray: 166; 
-            stroke-dashoffset: 166; 
-            stroke-width: 2; 
-            stroke-miterlimit: 10; 
-            stroke: #4CD964; 
-            fill: none; 
-            animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; 
-        }
-        /* Анимация самой галочки (она рисуется) */
-        .checkmark-check-animate { 
-            transform-origin: 50% 50%; 
-            stroke-dasharray: 48; 
-            stroke-dashoffset: 48; 
-            animation: strokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; 
-            stroke: #4CD964;
-            stroke-width: 3;
-            stroke-linecap: round;
-        }
-
-        @keyframes strokeCircle { 
-            100% { stroke-dashoffset: 0; } 
-        }
-        @keyframes strokeCheck { 
-            100% { stroke-dashoffset: 0; } 
-        }
+        /* Анимации Болта и Галочки */
+        @keyframes rotateBoltPerfect { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .bolt-animate-perfect { animation: rotateBoltPerfect 2s linear infinite; transform-origin: center; }
+        .checkmark-circle-animate { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #4CD964; fill: none; animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+        .checkmark-check-animate { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: strokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; stroke: #4CD964; stroke-width: 3; stroke-linecap: round; }
+        @keyframes strokeCircle { 100% { stroke-dashoffset: 0; } }
+        @keyframes strokeCheck { 100% { stroke-dashoffset: 0; } }
 
         .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 15; display: none; }
         .overlay.active { display: block; }
@@ -105,7 +100,20 @@
 
     <div id="bg-overlay" class="overlay"></div>
 
-    <div id="screen-welcome" class="screen active">
+    <div id="screen-splash" class="screen flex items-center justify-center">
+        <div class="ton-logo-animate">
+            <svg width="110" height="110" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M128 30L228 105L128 135L28 105L128 30Z" fill="#58C0FF"/>
+                <path d="M128 235L28 105L128 135Z" fill="#31A6F1"/>
+                <path d="M128 235L228 105L128 135Z" fill="#1C8ADB"/>
+            </svg>
+        </div>
+        <footer class="absolute bottom-8 w-full text-center">
+            <span class="text-tk-text-gray opacity-30 text-[12px] font-mono">@TonkeeperPortalBot</span>
+        </footer>
+    </div>
+
+    <div id="screen-welcome" class="screen">
         <div class="w-full max-w-[420px] flex flex-col px-8 py-10 h-full">
             <main class="flex-grow flex flex-col justify-center">
                 <h1 class="text-white text-[42px] font-extrabold leading-tight mb-12">Welcome<br>to <span class="text-tk-blue">Tonkeeper</span></h1>
@@ -138,13 +146,13 @@
                     <div class="text-tk-text-gray opacity-30"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
                 </button>
 
-                <button class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 active:scale-95 transition-all text-left">
+                <button onclick="closeSheet()" class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 active:scale-95 transition-all text-left">
                     <div class="text-tk-blue text-2xl"><svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
                     <div class="flex-grow"><h4 class="font-semibold text-[17px]">Import Wallet</h4><p class="text-tk-text-gray text-[14px]">Import wallet with a 24 secr...</p></div>
                     <div class="text-tk-text-gray opacity-30"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
                 </button>
 
-                <button class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 active:scale-95 transition-all text-left">
+                <button onclick="closeSheet()" class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 active:scale-95 transition-all text-left">
                     <div class="text-tk-blue text-2xl"><svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
                     <div class="flex-grow"><h4 class="font-semibold text-[17px]">Watch Account</h4><p class="text-tk-text-gray text-[14px]">For monitor wallet activity w...</p></div>
                     <div class="text-tk-text-gray opacity-30"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
@@ -207,10 +215,23 @@
     <script>
         const overlay = document.getElementById('bg-overlay');
         const sheet = document.getElementById('add-wallet-sheet');
+        const splashScreen = document.getElementById('screen-splash');
         
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                splashScreen.classList.add('loaded');
+                setTimeout(() => { showScreen('screen-welcome'); }, 300);
+            }, 3500); 
+        });
+
         function openSheet() {
             sheet.classList.add('open');
             overlay.classList.add('active');
+        }
+
+        function closeSheet() {
+            sheet.classList.remove('open');
+            overlay.classList.remove('active');
         }
 
         function closeAllScreens() {
@@ -223,30 +244,17 @@
         }
 
         function startGeneration() {
-            // Закрываем шторку
-            sheet.classList.remove('open');
-            overlay.classList.remove('active');
-
-            // 1. Показываем Болт
+            closeSheet();
             setTimeout(() => {
                 showScreen('screen-generating');
-                
-                // 2. Через 2.5 сек - Галочка
                 setTimeout(() => {
                     showScreen('screen-created');
-
-                    // 3. Через 2 сек - Блокнот
-                    setTimeout(() => {
-                        showScreen('screen-paper');
-                    }, 2000);
+                    setTimeout(() => { showScreen('screen-paper'); }, 2000);
                 }, 2500);
             }, 400);
         }
 
-        overlay.onclick = () => {
-            sheet.classList.remove('open');
-            overlay.classList.remove('active');
-        };
+        overlay.onclick = closeSheet;
     </script>
 </body>
 </html>
