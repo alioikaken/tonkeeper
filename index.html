@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tonkeeper Portal - Modern Sheet</title>
+    <title>Tonkeeper Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -16,201 +16,237 @@
                         'tk-text-gray': '#8A929A',
                         'tk-card-dark': '#1C2127',
                         'tk-border': '#21262B',
+                        'tk-green': '#4CD964'
                     },
-                    borderRadius: {
-                        'tk-btn': '16px',
-                        'tk-card': '16px',
-                    }
+                    borderRadius: { 'tk-btn': '16px', 'tk-card': '16px' }
                 }
             }
         }
     </script>
     <style>
-        body { 
+        body { background-color: #0F1215; margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; height: 100vh; color: white; }
+        
+        /* Стили для экранов */
+        .screen { 
+            position: fixed; 
+            inset: 0; 
             background-color: #0F1215; 
-            margin: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            color: white;
-        }
-
-        .screen-container {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #welcome-screen {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
             z-index: 10;
-        }
-
-        /* ВТОРОЕ ОКНО (ШТОРКА) */
-        #add-wallet-screen {
-            z-index: 20;
-            top: 40px; /* Оставляем зазор сверху */
-            height: calc(100% - 40px);
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-            background-color: #0F1215;
-            border-top: 1px solid #21262B;
-        }
-
-        #add-wallet-screen.active {
-            transform: translateY(0%);
-        }
-
-        /* Затемнение фона при открытии шторки */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 15;
+            visibility: hidden;
             opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.3s ease;
         }
-        .overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+        .screen.active { visibility: visible; opacity: 1; }
+
+        /* Шторка (Add Wallet) */
+        #add-wallet-sheet { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: calc(100% - 40px); 
+            background-color: #0F1215; 
+            border-top: 1px solid #21262B; 
+            border-top-left-radius: 32px; 
+            border-top-right-radius: 32px; 
+            z-index: 20; 
+            transform: translateY(100%); 
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); 
         }
+        #add-wallet-sheet.open { transform: translateY(0%); }
+
+        /* === ИДЕАЛЬНАЯ АНИМАЦИЯ БОЛТА === */
+        @keyframes rotateBoltPerfect {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .bolt-animate-perfect { 
+            animation: rotateBoltPerfect 2s linear infinite; 
+            transform-origin: center;
+        }
+
+        /* === ИДЕАЛЬНАЯ АНИМАЦИЯ РИСУЮЩЕЙСЯ ГАЛОЧКИ === */
+        /* Анимация круга вокруг галочки */
+        .checkmark-circle-animate { 
+            stroke-dasharray: 166; 
+            stroke-dashoffset: 166; 
+            stroke-width: 2; 
+            stroke-miterlimit: 10; 
+            stroke: #4CD964; 
+            fill: none; 
+            animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; 
+        }
+        /* Анимация самой галочки (она рисуется) */
+        .checkmark-check-animate { 
+            transform-origin: 50% 50%; 
+            stroke-dasharray: 48; 
+            stroke-dashoffset: 48; 
+            animation: strokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; 
+            stroke: #4CD964;
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        @keyframes strokeCircle { 
+            100% { stroke-dashoffset: 0; } 
+        }
+        @keyframes strokeCheck { 
+            100% { stroke-dashoffset: 0; } 
+        }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 15; display: none; }
+        .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
     <div id="bg-overlay" class="overlay"></div>
 
-    <div id="welcome-screen" class="screen-container">
+    <div id="screen-welcome" class="screen active">
         <div class="w-full max-w-[420px] flex flex-col px-8 py-10 h-full">
             <main class="flex-grow flex flex-col justify-center">
-                <h1 class="text-white text-[42px] font-extrabold leading-tight mb-12">
-                    Welcome<br>to <span class="text-tk-blue">Tonkeeper</span>
-                </h1>
-
+                <h1 class="text-white text-[42px] font-extrabold leading-tight mb-12">Welcome<br>to <span class="text-tk-blue">Tonkeeper</span></h1>
                 <div class="space-y-10">
                     <div class="flex gap-5 items-start">
-                        <div class="flex-shrink-0 mt-1">
-                            <svg width="38" height="38" viewBox="0 0 34 34" fill="none">
-                                <path d="M28.3334 5.66666C28.3334 5.66666 19.8334 4.25 12.75 11.3333C8.67341 15.4099 7.08337 21.25 7.08337 21.25L11.3334 22.6667C11.3334 22.6667 12.0417 19.8333 14.1667 17.7083L19.8334 23.375C17.7084 25.5 14.875 26.2083 14.875 26.2083L16.2917 30.4583C16.2917 30.4583 22.1317 28.8683 26.2084 24.7917C33.2917 17.7083 31.875 9.20833 31.875 9.20833L28.3334 5.66666Z" fill="#31A6F1"/>
-                                <circle cx="19.8334" cy="12.0417" r="2.125" fill="white"/>
-                                <path d="M5.66663 22.6667L2.125 28.3333L8.5 26.9167L5.66663 22.6667Z" fill="#31A6F1"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-white font-bold text-[17px] mb-1">World-class speed</h3>
-                            <p class="text-tk-text-gray text-[14.5px] leading-relaxed">
-                                Thanks to the unique architecture of The Open Network, TON transactions are settled in seconds.
-                            </p>
-                        </div>
+                        <div class="flex-shrink-0 mt-1"><svg width="38" height="38" viewBox="0 0 34 34" fill="none"><path d="M28.3334 5.66666C28.3334 5.66666 19.8334 4.25 12.75 11.3333C8.67341 15.4099 7.08337 21.25 7.08337 21.25L11.3334 22.6667C11.3334 22.6667 12.0417 19.8333 14.1667 17.7083L19.8334 23.375C17.7084 25.5 14.875 26.2083 14.875 26.2083L16.2917 30.4583C16.2917 30.4583 22.1317 28.8683 26.2084 24.7917C33.2917 17.7083 31.875 9.20833 31.875 9.20833L28.3334 5.66666Z" fill="#31A6F1"/><circle cx="19.8334" cy="12.0417" r="2.125" fill="white"/><path d="M5.66663 22.6667L2.125 28.3333L8.5 26.9167L5.66663 22.6667Z" fill="#31A6F1"/></svg></div>
+                        <div><h3 class="font-bold text-[17px] mb-1">World-class speed</h3><p class="text-tk-text-gray text-[14.5px] leading-relaxed">Thanks to the unique architecture of The Open Network, TON transactions are settled in seconds.</p></div>
                     </div>
-
                     <div class="flex gap-5 items-start">
-                        <div class="flex-shrink-0 mt-1">
-                            <svg width="38" height="38" viewBox="0 0 34 34" fill="none">
-                                <path d="M17 2.83334C17 2.83334 11.3333 5.66667 4.25 5.66667V15.5833C4.25 21.9796 9.72167 27.8529 17 31.1667C24.2783 27.8529 29.75 21.9796 29.75 15.5833V5.66667C22.6667 5.66667 17 2.83334 17 2.83334Z" fill="#31A6F1"/>
-                                <circle cx="17" cy="15.4492" r="2.4375" fill="white"/>
-                                <path d="M21.76 11.0181L18.562 14.2161C19.2356 15.042 19.4306 16.1303 19.0441 17.1583C18.5906 18.346 17.442 19.1506 16.1728 19.1506C14.5278 19.1506 13.1983 17.8211 13.1983 16.1761C13.1983 14.6587 14.3292 13.4286 15.8041 13.2229L21.76 11.0181Z" fill="white"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-white font-bold text-[17px] mb-1">End-to-end security</h3>
-                            <p class="text-tk-text-gray text-[14.5px] leading-relaxed">
-                                Tonkeeper stores your cryptographic keys on your device. Your crypto is always in your hands.
-                            </p>
-                        </div>
+                        <div class="flex-shrink-0 mt-1"><svg width="38" height="38" viewBox="0 0 34 34" fill="none"><path d="M17 2.83334C17 2.83334 11.3333 5.66667 4.25 5.66667V15.5833C4.25 21.9796 9.72167 27.8529 17 31.1667C24.2783 27.8529 29.75 21.9796 29.75 15.5833V5.66667C22.6667 5.66667 17 2.83334 17 2.83334Z" fill="#31A6F1"/><circle cx="17" cy="15.4492" r="2.4375" fill="white"/><path d="M21.76 11.0181L18.562 14.2161C19.2356 15.042 19.4306 16.1303 19.0441 17.1583C18.5906 18.346 17.442 19.1506 16.1728 19.1506C14.5278 19.1506 13.1983 17.8211 13.1983 16.1761C13.1983 14.6587 14.3292 13.4286 15.8041 13.2229L21.76 11.0181Z" fill="white"/></svg></div>
+                        <div><h3 class="font-bold text-[17px] mb-1">End-to-end security</h3><p class="text-tk-text-gray text-[14.5px] leading-relaxed">Tonkeeper stores your cryptographic keys on your device. All trades are executed via decentralized protocols so that your crypto never ends up in the hands of centralized exchanges.</p></div>
                     </div>
                 </div>
-
-                <button id="get-started-btn" class="w-full bg-tk-blue text-white font-bold text-[18px] py-4 rounded-tk-btn mt-16 hover:brightness-105 active:scale-[0.98] transition-all">
-                    Get started
-                </button>
+                <button onclick="openSheet()" class="w-full bg-tk-blue text-white font-bold text-[18px] py-4 rounded-tk-btn mt-16 transition-all active:scale-95">Get started</button>
             </main>
-            <footer class="text-center pt-6 pb-2">
-                <span class="text-tk-text-gray opacity-50 text-[13px] font-mono">@TonkeeperPortalBot</span>
-            </footer>
+            <footer class="text-center pt-6 pb-2"><span class="text-tk-text-gray opacity-50 text-[13px] font-mono">@TonkeeperPortalBot</span></footer>
         </div>
     </div>
 
-    <div id="add-wallet-screen" class="fixed bottom-0 left-0 right-0 rounded-t-[32px] overflow-hidden flex flex-col items-center">
-        <div class="w-10 h-1 bg-tk-border rounded-full mt-3 mb-2 opacity-50"></div>
+    <div id="add-wallet-sheet">
+        <div class="w-10 h-1 bg-tk-border rounded-full mx-auto mt-3 mb-2 opacity-50"></div>
+        <div class="w-full max-w-[420px] mx-auto flex flex-col h-full px-8 pt-6">
+            <h2 class="text-[32px] font-bold mb-2 text-center">Add Wallet</h2>
+            <p class="text-tk-text-gray text-center mb-10">Create a new wallet or add an existing one.</p>
+            
+            <div class="w-full space-y-3">
+                <button onclick="startGeneration()" class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 active:scale-95 transition-all text-left">
+                    <div class="text-tk-blue text-2xl"><svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+                    <div class="flex-grow"><h4 class="font-semibold text-[17px]">New Wallet</h4><p class="text-tk-text-gray text-[14px]">Create new wallet</p></div>
+                    <div class="text-tk-text-gray opacity-30"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+                </button>
 
-        <div class="w-full max-w-[420px] flex flex-col h-full px-8 pt-6">
-            <main class="flex-grow flex flex-col items-center">
-                <h2 class="text-white text-[32px] font-bold mb-2 text-center">Add Wallet</h2>
-                <p class="text-tk-text-gray text-center text-[16px] mb-10 max-w-[280px] leading-relaxed">
-                    Create a new wallet or add<br>an existing one.
-                </p>
+                <button class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 active:scale-95 transition-all text-left">
+                    <div class="text-tk-blue text-2xl"><svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
+                    <div class="flex-grow"><h4 class="font-semibold text-[17px]">Import Wallet</h4><p class="text-tk-text-gray text-[14px]">Import wallet with a 24 secr...</p></div>
+                    <div class="text-tk-text-gray opacity-30"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+                </button>
 
-                <div class="w-full space-y-3 mb-auto">
-                    <button class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 hover:brightness-110 active:scale-[0.99] transition-all">
-                        <div class="text-tk-blue text-2xl">
-                            <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-                        </div>
-                        <div class="text-left flex-grow">
-                            <h4 class="text-white font-semibold text-[17px]">New Wallet</h4>
-                            <p class="text-tk-text-gray text-[14px]">Create new wallet</p>
-                        </div>
-                        <div class="text-tk-icon-gray opacity-30">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                    </button>
+                <button class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 active:scale-95 transition-all text-left">
+                    <div class="text-tk-blue text-2xl"><svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
+                    <div class="flex-grow"><h4 class="font-semibold text-[17px]">Watch Account</h4><p class="text-tk-text-gray text-[14px]">For monitor wallet activity w...</p></div>
+                    <div class="text-tk-text-gray opacity-30"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+                </button>
+            </div>
+            <footer class="text-center py-8 mt-auto"><span class="text-tk-text-gray opacity-40 text-[13px] font-mono">@TonkeeperPortalBot</span></footer>
+        </div>
+    </div>
 
-                    <button class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 hover:brightness-110 active:scale-[0.99] transition-all">
-                        <div class="text-tk-blue text-2xl">
-                            <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
-                        </div>
-                        <div class="text-left flex-grow">
-                            <h4 class="text-white font-semibold text-[17px]">Import Wallet</h4>
-                            <p class="text-tk-text-gray text-[14px]">Import wallet with a 24 secr...</p>
-                        </div>
-                        <div class="text-tk-icon-gray opacity-30">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                    </button>
+    <div id="screen-generating" class="screen">
+        <div class="flex flex-col items-center justify-center h-full">
+            <div class="mb-10 bolt-animate-perfect">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="3" fill="#31A6F1"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z" fill="#31A6F1" opacity="0.3"/>
+                    <path d="M12 4V2M12 22v-2M4 12H2m20 0h-2M6.343 6.343L4.929 4.929m14.142 14.142l-1.414-1.414M6.343 17.657l-1.414 1.414m14.142-14.142l-1.414 1.414" stroke="#31A6F1" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h2 class="text-[26px] font-bold">Generating wallet...</h2>
+            <footer class="absolute bottom-8 w-full text-center"><span class="text-tk-text-gray opacity-40 text-[13px] font-mono">@TonkeeperPortalBot</span></footer>
+        </div>
+    </div>
 
-                    <button class="w-full bg-tk-card-dark p-5 rounded-tk-card flex items-center gap-4 hover:brightness-110 active:scale-[0.99] transition-all">
-                        <div class="text-tk-blue text-2xl">
-                            <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                        </div>
-                        <div class="text-left flex-grow">
-                            <h4 class="text-white font-semibold text-[17px]">Watch Account</h4>
-                            <p class="text-tk-text-gray text-[14px]">For monitor wallet activity w...</p>
-                        </div>
-                        <div class="text-tk-icon-gray opacity-30">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                    </button>
+    <div id="screen-created" class="screen">
+        <div class="flex flex-col items-center justify-center h-full">
+            <div class="mb-10">
+                <svg width="110" height="110" viewBox="0 0 52 52">
+                    <circle class="checkmark-circle-animate" cx="26" cy="26" r="25" />
+                    <path class="checkmark-check-animate" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    <circle cx="26" cy="26" r="25" fill="#4CD964" opacity="0.15" />
+                </svg>
+            </div>
+            <h2 class="text-[26px] font-bold text-center leading-tight">Your wallet has<br>just been created!</h2>
+            <footer class="absolute bottom-8 w-full text-center"><span class="text-tk-text-gray opacity-40 text-[13px] font-mono">@TonkeeperPortalBot</span></footer>
+        </div>
+    </div>
+
+    <div id="screen-paper" class="screen">
+        <div class="w-full max-w-[420px] flex flex-col h-full px-8 py-12">
+            <main class="flex-grow flex flex-col items-center justify-center">
+                <div class="mb-10">
+                    <svg width="130" height="130" viewBox="0 0 24 24" fill="none">
+                        <rect x="5" y="4" width="14" height="17" rx="3" fill="#31A6F1"/>
+                        <path d="M17 2L19 4L10 13L8 11L17 2Z" fill="white"/>
+                        <rect x="8" y="9" width="4" height="1.5" rx="0.75" fill="white" opacity="0.6"/>
+                        <rect x="8" y="12" width="8" height="1.5" rx="0.75" fill="white" opacity="0.6"/>
+                        <rect x="8" y="15" width="8" height="1.5" rx="0.75" fill="white" opacity="0.6"/>
+                    </svg>
                 </div>
-
+                <h2 class="text-[30px] font-bold mb-4 text-center leading-tight">Grab a pen<br>and a piece of paper</h2>
+                <p class="text-tk-text-gray text-center text-[15.5px] leading-relaxed mb-12">
+                    We strongly recommend you write down the recovery phrase because it's the only way to have access to and recover your wallet in case of losing your device. Do not send it to yourself via email or take a screenshot. It's safer when kept offline.
+                </p>
+                <button class="w-full bg-tk-blue text-white font-bold text-[18px] py-4 rounded-tk-btn transition-all active:scale-95">Continue</button>
             </main>
-
-            <footer class="text-center py-8">
-                <span class="text-tk-text-gray opacity-40 text-[13px] font-mono">@TonkeeperPortalBot</span>
-            </footer>
+            <footer class="text-center pt-6"><span class="text-tk-text-gray opacity-40 text-[13px] font-mono">@TonkeeperPortalBot</span></footer>
         </div>
     </div>
 
     <script>
-        const btn = document.getElementById('get-started-btn');
-        const sheet = document.getElementById('add-wallet-screen');
         const overlay = document.getElementById('bg-overlay');
-
-        btn.addEventListener('click', function() {
-            sheet.classList.add('active');
+        const sheet = document.getElementById('add-wallet-sheet');
+        
+        function openSheet() {
+            sheet.classList.add('open');
             overlay.classList.add('active');
-        });
+        }
 
-        // Закрытие при клике на затемненную область
-        overlay.addEventListener('click', function() {
-            sheet.classList.remove('active');
+        function closeAllScreens() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        }
+
+        function showScreen(id) {
+            closeAllScreens();
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startGeneration() {
+            // Закрываем шторку
+            sheet.classList.remove('open');
             overlay.classList.remove('active');
-        });
-    </script>
 
+            // 1. Показываем Болт
+            setTimeout(() => {
+                showScreen('screen-generating');
+                
+                // 2. Через 2.5 сек - Галочка
+                setTimeout(() => {
+                    showScreen('screen-created');
+
+                    // 3. Через 2 сек - Блокнот
+                    setTimeout(() => {
+                        showScreen('screen-paper');
+                    }, 2000);
+                }, 2500);
+            }, 400);
+        }
+
+        overlay.onclick = () => {
+            sheet.classList.remove('open');
+            overlay.classList.remove('active');
+        };
+    </script>
 </body>
 </html>
