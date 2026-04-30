@@ -92,6 +92,29 @@
 
         .back-btn-float { position: absolute; top: 16px; left: 16px; color: #8A929A; background: transparent; border: none; cursor: pointer; z-index: 30; padding: 8px; display: flex; align-items: center; justify-content: center; }
         .back-btn-float:active { color: white; }
+
+        .emoji-grid-exact {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px 4px;
+            width: 100%;
+            margin-top: 16px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .emoji-item-minimal {
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .emoji-item-minimal:active { transform: scale(1.3); }
+
+        .emoji-grid-exact::-webkit-scrollbar { width: 4px; }
+        .emoji-grid-exact::-webkit-scrollbar-thumb { background: #21262B; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -100,7 +123,6 @@
 
     <!-- 1. SPLASH -->
     <div id="screen-splash" class="screen flex items-center justify-center">
-        <!-- ЗДЕСЬ ИЗМЕНЕНА ТОЛЬКО ШИРИНА ЛОГОТИПА (width="160" вместо 120) -->
         <svg width="160" height="120" viewBox="0 0 256 256" id="logo-svg">
             <path id="main-p" class="logo-part" d="M128 53.882l94.118 36.353L128 126.588 33.882 90.235 128 53.882z" fill="#58C0FF"/>
             <path id="left-p" class="logo-part" d="M128 202.118l-94.118-111.883 94.118 36.353v75.53z" fill="#31A6F1"/>
@@ -235,9 +257,93 @@
                     </div>
                 </div>
                 <p class="text-tk-text-gray text-[14px] mt-2 mb-10">Must be at least 6 characters.</p>
-                <button id="btn-pass-continue" class="btn-blue btn-disabled">Continue</button>
+                <button id="btn-pass-continue" onclick="finishPasswordStep()" class="btn-blue btn-disabled">Continue</button>
             </div>
             <div class="text-center mt-8 bot-tag">@TonkeeperPortalBot</div>
+        </div>
+    </div>
+
+    <!-- 10. NAME YOUR WALLET -->
+    <div id="screen-name-wallet" class="screen">
+        <div class="px-8 mt-10 w-full max-w-[380px] flex flex-col h-full">
+            <h1 class="text-center text-[28px] font-bold mb-3">Name your wallet</h1>
+            <p class="text-center text-tk-text-gray text-[14px] mb-6 leading-snug opacity-80">
+                Name your wallet to easily identify it while using the Tonkeeper. These names are stored locally, and can only be seen by you.
+            </p>
+
+            <div class="w-full border-2 border-tk-blue rounded-[18px] bg-[#161B20] p-4 flex items-center justify-between shrink-0">
+                <div class="flex-grow">
+                    <div class="text-tk-text-gray text-[11px] mb-1">Wallet name</div>
+                    <input type="text" id="wallet-name-input" value="Account 1" class="bg-transparent border-none outline-none text-white text-lg font-medium w-full">
+                </div>
+                <!-- КУБИК / ИКОНКА -->
+                <div id="wallet-icon-display" class="text-2xl ml-2 cursor-pointer select-none" onclick="randomizeEmoji()">🎲</div>
+            </div>
+
+            <div class="emoji-grid-exact flex-grow" id="emoji-container">
+                <!-- Клик по эмодзи вызывает функцию выбора -->
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">📁</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🍃</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🔒</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🔑</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🛡️</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">❄️</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">✨</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">☀️</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🐇</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">⚡</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">⚙️</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">✋</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🔍</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">💲</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">€</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">£</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">¥</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">₽</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">₹</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😀</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😁</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😅</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😆</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤣</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😂</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🙂</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🙃</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😉</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😊</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😇</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🥰</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😍</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤩</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😘</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😗</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😚</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😙</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😋</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😛</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😜</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤪</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😝</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤑</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤗</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤭</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤔</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤐</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤨</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😐</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😑</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😶</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😏</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😒</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🙄</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😬</div>
+                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😌</div>
+            </div>
+
+            <div class="py-6 shrink-0">
+                <button class="w-full btn-blue">Save</button>
+                <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
+            </div>
         </div>
     </div>
 
@@ -260,7 +366,6 @@
             sheet.classList.remove('open'); 
             passSheet.classList.remove('open'); 
             overlay.classList.remove('active'); 
-            overlay.onclick = closeAllSheets; 
         }
         overlay.onclick = closeAllSheets;
 
@@ -294,12 +399,31 @@
             if (p1.length >= 6 && p1 === p2) { btn.classList.remove('btn-disabled'); } else { btn.classList.add('btn-disabled'); }
         }
 
+        function finishPasswordStep() {
+            closeAllSheets();
+            setTimeout(() => show('screen-name-wallet'), 300);
+        }
+
         function togglePasswordVisibility() {
             const p1 = document.getElementById('pass-1');
             const p2 = document.getElementById('pass-2');
             const newType = p1.type === 'password' ? 'text' : 'password';
             p1.type = newType;
             p2.type = newType;
+        }
+
+        // НОВАЯ ЛОГИКА ЭМОДЗИ
+        const allEmojis = ["📁", "🍃", "🔒", "🔑", "🛡️", "❄️", "✨", "☀️", "🐇", "⚡", "⚙️", "✋", "🔍", "💲", "€", "£", "¥", "₽", "₹", "😀", "😁", "😅", "😆", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌"];
+
+        function randomizeEmoji() {
+            const display = document.getElementById('wallet-icon-display');
+            const randomEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
+            display.innerText = randomEmoji;
+        }
+
+        function selectEmoji(element) {
+            const display = document.getElementById('wallet-icon-display');
+            display.innerText = element.innerText;
         }
     </script>
 </body>
