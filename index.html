@@ -66,6 +66,7 @@
         .footer-fixed {
             position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px 40px;
             background: linear-gradient(to top, #0F1215 85%, transparent);
+            z-index: 60;
         }
         .btn-blue { width: 100%; background-color: #0098EA; color: white; padding: 16px; border-radius: 20px; font-size: 18px; font-weight: 600; transition: transform 0.1s; }
         .btn-blue:active { transform: scale(0.98); }
@@ -115,6 +116,13 @@
 
         .emoji-grid-exact::-webkit-scrollbar { width: 4px; }
         .emoji-grid-exact::-webkit-scrollbar-thumb { background: #21262B; border-radius: 10px; }
+
+        /* ИСПРАВЛЕНИЕ СКРОЛЛА ДЛЯ ПРОВЕРКИ СЛОВ */
+        #screen-check {
+            overflow-y: auto;
+            display: block; /* Изменяем на block для работы стандартного скролла */
+            padding-bottom: 150px;
+        }
     </style>
 </head>
 <body>
@@ -219,18 +227,18 @@
         </div>
     </div>
 
-    <!-- 8. SO, LET'S CHECK -->
+    <!-- 8. SO, LET'S CHECK (ИСПРАВЛЕННЫЙ ЭКРАН) -->
     <div id="screen-check" class="screen px-8">
         <button class="back-btn-float" onclick="show('screen-recovery')"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-        <div class="w-full flex-grow flex flex-col items-center pt-12">
+        <div class="w-full flex flex-col items-center pt-12">
             <h1 class="text-[32px] font-bold text-center mb-2">So, let's check</h1>
             <p class="text-tk-text-gray text-center text-[16px] mb-10 leading-snug px-4">
                 To check whether you've written down your recovery phrase correctly, please enter the <span id="check-indices-text">5th, 12th, and 20th</span> words.
             </p>
-            <div class="w-full max-w-[340px] space-y-4">
-                <div class="check-input-wrapper" id="wrapper-1"><span class="check-label-fixed" id="label-1">5:</span><input type="text" id="check-input-1" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
-                <div class="check-input-wrapper" id="wrapper-2"><span class="check-label-fixed" id="label-2">12:</span><input type="text" id="check-input-2" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
-                <div class="check-input-wrapper" id="wrapper-3"><span class="check-label-fixed" id="label-3">20:</span><input type="text" id="check-input-3" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
+            <div class="w-full max-w-[340px] space-y-4 pb-10">
+                <div class="check-input-wrapper" id="wrapper-1"><span class="check-label-fixed" id="label-1">5:</span><input type="text" id="check-input-1" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 2)"></div>
+                <div class="check-input-wrapper" id="wrapper-2"><span class="check-label-fixed" id="label-2">12:</span><input type="text" id="check-input-2" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 3)"></div>
+                <div class="check-input-wrapper" id="wrapper-3"><span class="check-label-fixed" id="label-3">20:</span><input type="text" id="check-input-3" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 0)"></div>
             </div>
         </div>
         <div class="footer-fixed">
@@ -276,12 +284,10 @@
                     <div class="text-tk-text-gray text-[11px] mb-1">Wallet name</div>
                     <input type="text" id="wallet-name-input" value="Account 1" class="bg-transparent border-none outline-none text-white text-lg font-medium w-full">
                 </div>
-                <!-- КУБИК / ИКОНКА -->
                 <div id="wallet-icon-display" class="text-2xl ml-2 cursor-pointer select-none" onclick="randomizeEmoji()">🎲</div>
             </div>
 
             <div class="emoji-grid-exact flex-grow" id="emoji-container">
-                <!-- Клик по эмодзи вызывает функцию выбора -->
                 <div class="emoji-item-minimal" onclick="selectEmoji(this)">📁</div>
                 <div class="emoji-item-minimal" onclick="selectEmoji(this)">🍃</div>
                 <div class="emoji-item-minimal" onclick="selectEmoji(this)">🔒</div>
@@ -383,6 +389,19 @@
             document.getElementById('check-indices-text').innerText = `${formatIdx(verificationIndices[0])}, ${formatIdx(verificationIndices[1])}, and ${formatIdx(verificationIndices[2])}`;
             [1, 2, 3].forEach(i => { document.getElementById(`label-${i}`).innerText = (verificationIndices[i-1] + 1) + ':'; document.getElementById(`check-input-${i}`).value = ''; document.getElementById(`wrapper-${i}`).classList.remove('error'); });
             validateVerification(); show('screen-check');
+            // Скроллим вверх при входе
+            document.getElementById('screen-check').scrollTop = 0;
+        }
+
+        // ИСПРАВЛЕНИЕ: ПЕРЕКЛЮЧЕНИЕ МЕЖДУ ИНПУТАМИ ПО ENTER
+        function handleCheckKey(e, next) {
+            if (e.key === 'Enter') {
+                if (next === 0) {
+                    e.target.blur(); // Убираем клавиатуру на последнем поле
+                } else {
+                    document.getElementById(`check-input-${next}`).focus();
+                }
+            }
         }
 
         function validateVerification() {
@@ -412,7 +431,6 @@
             p2.type = newType;
         }
 
-        // НОВАЯ ЛОГИКА ЭМОДЗИ
         const allEmojis = ["📁", "🍃", "🔒", "🔑", "🛡️", "❄️", "✨", "☀️", "🐇", "⚡", "⚙️", "✋", "🔍", "💲", "€", "£", "¥", "₽", "₹", "😀", "😁", "😅", "😆", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌"];
 
         function randomizeEmoji() {
