@@ -100,10 +100,11 @@
 
     <!-- 1. SPLASH -->
     <div id="screen-splash" class="screen flex items-center justify-center">
-        <svg width="110" height="110" viewBox="0 0 256 256" id="logo-svg">
-            <path id="main-p" class="logo-part" d="M128 30L228 105L128 135L28 105L128 30Z" fill="#58C0FF"/>
-            <path id="left-p" class="logo-part" d="M128 235L28 105L128 135Z" fill="#31A6F1"/>
-            <path id="right-p" class="logo-part" d="M128 235L228 105L128 135Z" fill="#1C8ADB"/>
+        <!-- ЗДЕСЬ ИЗМЕНЕНА ТОЛЬКО ШИРИНА ЛОГОТИПА (width="160" вместо 120) -->
+        <svg width="160" height="120" viewBox="0 0 256 256" id="logo-svg">
+            <path id="main-p" class="logo-part" d="M128 53.882l94.118 36.353L128 126.588 33.882 90.235 128 53.882z" fill="#58C0FF"/>
+            <path id="left-p" class="logo-part" d="M128 202.118l-94.118-111.883 94.118 36.353v75.53z" fill="#31A6F1"/>
+            <path id="right-p" class="logo-part" d="M128 202.118l94.118-111.883-94.118 36.353v75.53z" fill="#1C8ADB"/>
         </svg>
         <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
     </div>
@@ -252,7 +253,7 @@
         function openPasswordSheet() { 
             passSheet.classList.add('open'); 
             overlay.classList.add('active');
-            overlay.onclick = closeAllSheets; // Возвращаем закрытие по клику на фон
+            overlay.onclick = closeAllSheets; 
         }
 
         function closeAllSheets() { 
